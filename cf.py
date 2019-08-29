@@ -5,11 +5,14 @@
 import requests
 import xml.etree.ElementTree as ET
 import sys
+import configparser
 from datetime import datetime
 from datetime import timedelta
 
-username = 'KJ7GES'         # The user's callsign
-password = ']F_l2;stY![r'   # HamQTH password
+config = configparser.ConfigParser()
+config.read('cf.conf')
+username = config.get('Credentials', 'User')       # The user's callsign
+password = config.get('Credentials', 'Password')   # HamQTH password
 
 def getsession():
     sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
