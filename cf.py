@@ -13,10 +13,8 @@ password = ']F_l2;stY![r'   # HamQTH password
 
 def getSession():
     sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
-    if sessionReq.status_code != requests.codes.ok:
-        print('HTTPS request error: {}'.format(sessionReq.status_code))
-        sys.exit(1)
-    root = ET.fromstring(sessionReq.content) #get XML tree from HTTPS request results
+    sessionReq.raise_for_status()               #check whether HTTP request succeeded
+    root = ET.fromstring(sessionReq.content)    #get XML tree from HTTPS request results
     sessionID = root[0][0].text
     elif sessionID == 'Wrong user name or password':
         print("Wrong user name or password!")
