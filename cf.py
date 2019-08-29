@@ -8,12 +8,12 @@ import sys
 from datetime import datetime
 from datetime import timedelta
 
-username = 'KJ7GES'         # should be the user's callsign
+username = 'KJ7GES'         # The user's callsign
 password = ']F_l2;stY![r'   # HamQTH password
 
 def getsession():
     sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
-    sessionReq.raise_for_status()               # check whether HTTP request succeeded
+    sessionReq.raise_for_status()               # check whether HTTP request was successful
     ## need to handle exception for timeouts/network errors etc here, add retry loop
     root = ET.fromstring(sessionReq.content)    # get XML tree from HTTPS request results
     sessionID = root[0][0].text
@@ -23,6 +23,7 @@ def getsession():
     else:
         expireTime = datetime.now() + timedelta(hours = 1)
         print('Connected to HamQTH.com Callsign Database\nSession ID: {}\nExpires {}'.format(sessionID, expireTime.strftime('%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
+        return sessionID
 
 def inputcallsign():
     callsign = ''
@@ -35,6 +36,43 @@ def inputcallsign():
         else:
             return callsign
 
+def fetchcallsigndata():
+    callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(sid, csign))
+    callsignreq.raise_for_status()      #check whether HTTP request was successful
+    csroot = ET.fromstring(callsignreq.content)
+    qtherror = csroot.find('*/{https://www.hamqth.com}error')
+    if qtherror != None:
+        print('HamQTH Error: {}'.format(qtherror.text))
+        return False
+    else:
+        csdict = {}
+        for child in csroot[0]:
+            tag = child.tag
+            csdict[tag.split('}')[1]] = child.text
+        try:
+            print('Name: {}'.format(csdict['adr_name']))
+            print('QTH: {}'.format(csdict['qth']))
+            print('Country: {}'.format(csdict['country']))
+            print('Email: {}'.format(csdict['email']))
+        except KeyError as e:
+            print('{} is not found!'.format(e))
+        again = ''
+        while again not in ['y', 'n']:
+            again = input("Do you want to lookup another callsign? (Y/N) ").lower()
+            if again == 'y':
+                return False
+                break
+            elif again == 'n':
+                return True
+                break
+            else:
+                continue
 
-getsession()
-inputcallsign()
+sid = getsession()
+while True:
+    csign = inputcallsign()
+    if not fetchcallsigndata():
+        continue
+    else:
+        break
+
