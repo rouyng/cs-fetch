@@ -12,11 +12,12 @@ username = 'KJ7GES'         # should be the user's callsign
 password = ']F_l2;stY![r'   # HamQTH password
 
 def getSession():
-    sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
+    sessionReq = requests.get('https://www.hamaaaqth.com/xml.php?u={}&p={}'.format(username, password))
     sessionReq.raise_for_status()               #check whether HTTP request succeeded
+    ## need to handle exception for timeouts/network errors etc here, add retry loop
     root = ET.fromstring(sessionReq.content)    #get XML tree from HTTPS request results
     sessionID = root[0][0].text
-    elif sessionID == 'Wrong user name or password':
+    if sessionID == 'Wrong user name or password':
         print("Wrong user name or password!")
         sys.exit(1)         # for now, just exit if credentials are wrong. eventually will implement input prompts for new credentials
     else:
