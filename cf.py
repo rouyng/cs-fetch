@@ -31,5 +31,4 @@ def getCallsign():
     # insert some validation
 
 getSession()
-
 getCallsign()
