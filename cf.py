@@ -9,11 +9,6 @@ import configparser
 from datetime import datetime
 from datetime import timedelta
 
-config = configparser.ConfigParser()
-config.read('cf.conf')
-username = config.get('Credentials', 'User')       # The user's callsign
-password = config.get('Credentials', 'Password')   # HamQTH password
-
 def getsession():
     sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
     sessionReq.raise_for_status()               # check whether HTTP request was successful
@@ -25,7 +20,10 @@ def getsession():
         sys.exit(1)         # exit if credentials are wrong. eventually will implement input prompts for new credentials
     else:
         expireTime = datetime.now() + timedelta(hours = 1)
-        print('Connected to HamQTH.com Callsign Database\nSession ID: {}\nExpires {}'.format(sessionID, expireTime.strftime('%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
+        config.set('Session', 'SID', str(sessionID))
+        config.set('Session', 'EXP', str(expireTime))
+        config.write(open('cf.conf','w'))
+        print('Connected to HamQTH.com as {}\nSession ID: {}\nExpires {}'.format(username, sessionID, expireTime.strftime('%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
         return sessionID
 
 def inputcallsign():
@@ -56,12 +54,13 @@ def fetchcallsigndata():
             print('Name: {}'.format(csdict['adr_name']))
             print('QTH: {}'.format(csdict['qth']))
             print('Country: {}'.format(csdict['country']))
+            print('Grid: {}'.format(csdict['grid']))
             print('Email: {}'.format(csdict['email']))
         except KeyError as e:
             print('{} is not found!'.format(e))
         again = ''
         while again not in ['y', 'n']:
-            again = input("Do you want to lookup another callsign? (Y/N) ").lower()
+            again = input("Do you want to lookup another callsign? (y/n) ").lower()
             if again == 'y':
                 return False
                 break
@@ -71,7 +70,18 @@ def fetchcallsigndata():
             else:
                 continue
 
-sid = getsession()
+config = configparser.ConfigParser()
+config.read('cf.conf')                              # read configuration file cf.conf
+username = config.get('Credentials', 'User')        # The user's callsign
+password = config.get('Credentials', 'Password')    # HamQTH password
+expireTime = config.get('Session', 'EXP')           # Session expiration date/time
+
+if datetime.now() >= datetime.strptime(expireTime.split('.')[0], '%Y-%m-%d %H:%M:%S'):
+    sid = getsession()
+else:
+    sid = config.get('Session', 'SID')              # Existing session ID
+    print('Existing session found\nSession ID: {}'.format(sid))
+
 while True:
     csign = inputcallsign()
     if not fetchcallsigndata():
