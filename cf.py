@@ -2,12 +2,14 @@
 # Uses HamQTH API, see https://www.hamqth.com/developers.php
 # You must have a HamQTH account as the API requires a valid username and password to start a session
 
-import requests
-import xml.etree.ElementTree as ET
-import sys
 import configparser
+import sys
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from datetime import timedelta
+
+import requests
+
 
 def getsession():
     sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
@@ -37,7 +39,7 @@ def inputcallsign():
         else:
             return callsign
 
-def fetchcallsigndata():
+def fetchcallsigndata():        # should this function return csdict, and printing be done in a different function? Is that more modular?
     callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(sid, csign))
     callsignreq.raise_for_status()      #check whether HTTP request was successful
     csroot = ET.fromstring(callsignreq.content)
@@ -57,7 +59,7 @@ def fetchcallsigndata():
             print('Grid: {}'.format(csdict['grid']))
             print('Email: {}'.format(csdict['email']))
         except KeyError as e:
-            print('{} is not found!'.format(e))
+            print('{} is not in HamQTH database'.format(e))
         again = ''
         while again not in ['y', 'n']:
             again = input("Do you want to lookup another callsign? (y/n) ").lower()
