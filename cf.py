@@ -78,7 +78,7 @@ username = config.get('Credentials', 'User')        # The user's callsign
 password = config.get('Credentials', 'Password')    # HamQTH password
 expireTime = config.get('Session', 'EXP')           # Session expiration date/time
 
-if datetime.now() >= datetime.strptime(expireTime.split('.')[0], '%Y-%m-%d %H:%M:%S'):
+if expireTime == '' or datetime.now() >= datetime.strptime(expireTime.split('.')[0], '%Y-%m-%d %H:%M:%S'):
     sid = getsession()
 else:
     sid = config.get('Session', 'SID')              # Existing session ID
