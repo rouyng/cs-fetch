@@ -53,10 +53,26 @@ def fetchcallsigndata():        # should this function return csdict, and printi
             tag = child.tag
             csdict[tag.split('}')[1]] = child.text
         try:
-            print('Name: {}'.format(csdict['adr_name']))
+            print('Nickname: {}'.format(csdict['nick']))
+        except KeyError as e:
+            print('{} is not in HamQTH database'.format(e))
+        try:
+            print('Name (from address): {}'.format(csdict['adr_name']))
+        except KeyError as e:
+            print('{} is not in HamQTH database'.format(e))
+        try:
             print('QTH: {}'.format(csdict['qth']))
+        except KeyError as e:
+            print('{} is not in HamQTH database'.format(e))
+        try:
             print('Country: {}'.format(csdict['country']))
+        except KeyError as e:
+            print('{} is not in HamQTH database'.format(e))
+        try:
             print('Grid: {}'.format(csdict['grid']))
+        except KeyError as e:
+            print('{} is not in HamQTH database'.format(e))
+        try:
             print('Email: {}'.format(csdict['email']))
         except KeyError as e:
             print('{} is not in HamQTH database'.format(e))
