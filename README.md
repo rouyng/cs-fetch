@@ -35,4 +35,4 @@ python -m cf.py
 - More sophisticated input validation based on all possible valid callsign formats
 
 ## License
-This project is released under the terms of the GNU GPL v3.0. See LICENSE.md for details.
+This project is released under the terms of the GNU GPL v3.0. See LICENSE file for details.
