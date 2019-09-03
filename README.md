@@ -35,6 +35,7 @@ python -m cf.py
 - Currently the choice of specific fields returned from HamQTH is hardcoded. Planning on making this configurable by modifying lines in the config file.
 - Need to automatically request a new session if the current session expires while the script is running.
 - More sophisticated input validation based on all possible valid callsign formats
+- Refactor some functions to separate out web requests and output to user?
 
 ## License
 This project is released under the terms of the GNU GPL v3.0. See LICENSE file for details.
