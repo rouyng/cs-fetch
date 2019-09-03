@@ -14,7 +14,7 @@ Features include:
 
 You can read more about the HamQTH API here: https://www.hamqth.com/developers.php
 
-This is a basic Python script primarily written as a practice exercise, so any suggestions or constructive critique is welcome.
+This is a basic Python script primarily written as a practice exercise, suggestions and constructive critique are welcome.
 
 ## Use
 Tested with Python 3.7.0
