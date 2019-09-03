@@ -4,7 +4,7 @@ A simple Python script to lookup amateur radio license information via the HamQT
 By Ross, KJ7GES
 
 ## Overview
-This script interactively takes callsigns as an input, looks them up in the HamQTH.com database, and returns several info fields if the callsign exists in the database. Designed for simple, quick operation when you don't want to use a logging program or deal with a mouse-driven web UI and just want basic information about the callsign. 
+This script interactively takes amateur (ham) radio callsigns as an input, looks them up in the HamQTH.com database, and returns several info fields if the callsign exists in the database. Designed for simple, quick operation when you don't want to use a logging program or deal with a mouse-driven web UI and just want basic information about the callsign. 
 
 Features include:
 - reading credentials from a configuration file
