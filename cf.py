@@ -10,7 +10,9 @@ from datetime import timedelta
 
 import requests
 
+# BEGIN FUNCTION DEFINITIONS
 
+# This function requests a new session from the HamQTH API
 def getsession():
     sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
     sessionReq.raise_for_status()               # check whether HTTP request was successful
@@ -18,7 +20,7 @@ def getsession():
     root = ET.fromstring(sessionReq.content)    # get XML tree from HTTPS request results
     sessionID = root[0][0].text
     if sessionID == 'Wrong user name or password':
-        print("Wrong user name or password!")
+        print("Wrong user name or password! Please enter valid HamQTH.com credentials in cf.conf")
         sys.exit(1)         # exit if credentials are wrong. eventually will implement input prompts for new credentials
     else:
         expireTime = datetime.now() + timedelta(hours = 1)
@@ -28,6 +30,7 @@ def getsession():
         print('Connected to HamQTH.com as {}\nSession ID: {}\nExpires {}'.format(username, sessionID, expireTime.strftime('%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
         return sessionID
 
+# This function validates input of callsign to be looked up, additional validation will be added here later
 def inputcallsign():
     callsign = ''
     while True:
@@ -39,7 +42,10 @@ def inputcallsign():
         else:
             return callsign
 
-def fetchcallsigndata():        # should this function return csdict, and printing be done in a different function? Is that more modular?
+# This function requests information from the HamQTH API given a valid session ID
+# TODO: make this function return csdict and have printing be done in a different function. For increased modularity
+# TODO: make this function take session ID and callsign as arguments, rather than calling specific variable names
+def fetchcallsigndata():
     callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(sid, csign))
     callsignreq.raise_for_status()      #check whether HTTP request was successful
     csroot = ET.fromstring(callsignreq.content)
@@ -87,7 +93,9 @@ def fetchcallsigndata():        # should this function return csdict, and printi
                 break
             else:
                 continue
+# END FUNCTION DEFINITIONS
 
+# Main sequence of program begins here
 config = configparser.ConfigParser()
 config.read('cf.conf')                              # read configuration file cf.conf
 username = config.get('Credentials', 'User')        # The user's callsign
