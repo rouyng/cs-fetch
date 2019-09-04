@@ -4,13 +4,12 @@
 
 import configparser
 import sys
+import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from datetime import timedelta
 
-import requests
-
-# BEGIN FUNCTION DEFINITIONS
+## BEGIN FUNCTION DEFINITIONS
 
 # This function requests a new session from the HamQTH API
 def getsession():
@@ -58,6 +57,7 @@ def fetchcallsigndata(session_id, callsign):
             csdict[tag.split('}')[1]] = child.text
     return csdict
 
+# This function prints selected fields from the dict returned by fetchcallsign data, along with human-friendly labels
 def print_callsign_info(print_these_fields, callsign_dictionary):
     if not print_these_fields:  # if no parameter is passed, populate this list with default values
         print_these_fields = ['nick', 'qth', 'grid', 'email'] # these are the fields that will be printed by default
@@ -70,9 +70,10 @@ def print_callsign_info(print_these_fields, callsign_dictionary):
                     'email' : 'Email address'}
     for key in print_these_fields & field_labels.keys() & callsign_dictionary.keys():
         print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
-# END FUNCTION DEFINITIONS
 
-# MAIN SEQUENCE BEGIN
+## END FUNCTION DEFINITIONS
+
+## MAIN SEQUENCE BEGIN
 config = configparser.ConfigParser()
 config.read('cf.conf')                              # read configuration file cf.conf
 username = config.get('Credentials', 'User')        # The user's callsign is read from cf.conf
@@ -86,7 +87,6 @@ else:
     sid = config.get('Session', 'SID')              # Read existing session ID from cf.conf
     print('Existing session found\nSession ID: {}'.format(sid))
 
-# MAIN LOOP BEGIN
 while True:
     callsign = inputcallsign()  # call function for user input and input validation
     callsign_results = fetchcallsigndata(sid, callsign) # using session ID and callsign, request info from API and return as dict
@@ -96,6 +96,7 @@ while True:
     if again == 'y':
         continue
     elif again == 'n':
+        print('Exit!')
         break
 
 
