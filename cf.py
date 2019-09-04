@@ -42,15 +42,13 @@ def inputcallsign():
         else:
             return callsign
 
-# This function requests information from the HamQTH API given a valid session ID
-# TODO: make this function return csdict and have printing be done in a different function. For increased modularity
-# TODO: make this function take session ID and callsign as arguments, rather than calling specific variable names
-def fetchcallsigndata():
-    callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(sid, csign))
+# This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
+def fetchcallsigndata(session_id, callsign):
+    callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(session_id, callsign))
     callsignreq.raise_for_status()      #check whether HTTP request was successful
     csroot = ET.fromstring(callsignreq.content)
     qtherror = csroot.find('*/{https://www.hamqth.com}error')
-    if qtherror != None:
+    if qtherror:
         print('HamQTH Error: {}'.format(qtherror.text))
         return False
     else:
@@ -58,41 +56,8 @@ def fetchcallsigndata():
         for child in csroot[0]:
             tag = child.tag
             csdict[tag.split('}')[1]] = child.text
-        try:
-            print('Nickname: {}'.format(csdict['nick']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Name (from address): {}'.format(csdict['adr_name']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('QTH: {}'.format(csdict['qth']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Country: {}'.format(csdict['country']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Grid: {}'.format(csdict['grid']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Email: {}'.format(csdict['email']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        again = ''
-        while again not in ['y', 'n']:
-            again = input("Do you want to lookup another callsign? (y/n) ").lower()
-            if again == 'y':
-                return False
-                break
-            elif again == 'n':
-                return True
-                break
-            else:
-                continue
+    return csdict
+
 # END FUNCTION DEFINITIONS
 
 # Main sequence of program begins here
@@ -111,9 +76,14 @@ else:
 
 # Begin main loop
 while True:
-    csign = inputcallsign()
-    if not fetchcallsigndata():
+    callsign = inputcallsign()  # call function for user input and input validation
+    callsign_results = fetchcallsigndata(sid, callsign) # using session ID and callsign, request info from API and return as dict
+    # insert function to print desired info here
+    # Ask if we want to lookup another callsign
+    again = input("Do you want to lookup another callsign? (y/n) ").lower()
+    if again == 'y':
         continue
-    else:
+    elif again == 'n':
         break
+
 
