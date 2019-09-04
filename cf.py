@@ -98,16 +98,18 @@ def fetchcallsigndata():
 # Main sequence of program begins here
 config = configparser.ConfigParser()
 config.read('cf.conf')                              # read configuration file cf.conf
-username = config.get('Credentials', 'User')        # The user's callsign
-password = config.get('Credentials', 'Password')    # HamQTH password
-expireTime = config.get('Session', 'EXP')           # Session expiration date/time
+username = config.get('Credentials', 'User')        # The user's callsign is read from cf.conf
+password = config.get('Credentials', 'Password')    # HamQTH password is read from cf.conf
+expireTime = config.get('Session', 'EXP')           # Existing session expiration date/time read from cf.conf
 
+# If there is no saved session, or saved session is expired, run getsession
 if expireTime == '' or datetime.now() >= datetime.strptime(expireTime.split('.')[0], '%Y-%m-%d %H:%M:%S'):
     sid = getsession()
 else:
-    sid = config.get('Session', 'SID')              # Existing session ID
+    sid = config.get('Session', 'SID')              # Read existing session ID from cf.conf
     print('Existing session found\nSession ID: {}'.format(sid))
 
+# Begin main loop
 while True:
     csign = inputcallsign()
     if not fetchcallsigndata():
