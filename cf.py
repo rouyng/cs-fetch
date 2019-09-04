@@ -59,7 +59,9 @@ def fetchcallsigndata(session_id, callsign):
     return csdict
 
 def print_callsign_info(print_these_fields, callsign_dictionary):
-    print_these_fields = ['nick', 'qth', 'grid']
+    if not print_these_fields:  # if no parameter is passed, populate this list with default values
+        print_these_fields = ['nick', 'qth', 'grid', 'email'] # these are the fields that will be printed by default
+    # field_labels dict contains the human-friendly labels for each field the API may return
     field_labels = {'nick': 'Nickname',
                     'adr_name' : 'Name (from address)',
                     'qth' : 'QTH',
@@ -67,10 +69,7 @@ def print_callsign_info(print_these_fields, callsign_dictionary):
                     'grid' : 'Grid Square',
                     'email' : 'Email address'}
     for key in print_these_fields & field_labels.keys() & callsign_dictionary.keys():
-        try:
-            print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
-        except KeyError:
-            print('{} is not in HamQTH database'.format(field_labels[key]))
+        print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
 # END FUNCTION DEFINITIONS
 
 # MAIN SEQUENCE BEGIN
