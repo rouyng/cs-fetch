@@ -58,9 +58,22 @@ def fetchcallsigndata(session_id, callsign):
             csdict[tag.split('}')[1]] = child.text
     return csdict
 
+def print_callsign_info(print_these_fields, callsign_dictionary):
+    print_these_fields = ['nick', 'qth', 'grid']
+    field_labels = {'nick': 'Nickname',
+                    'adr_name' : 'Name (from address)',
+                    'qth' : 'QTH',
+                    'country' : 'Country',
+                    'grid' : 'Grid Square',
+                    'email' : 'Email address'}
+    for key in print_these_fields & field_labels.keys() & callsign_dictionary.keys():
+        try:
+            print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
+        except KeyError:
+            print('{} is not in HamQTH database'.format(field_labels[key]))
 # END FUNCTION DEFINITIONS
 
-# Main sequence of program begins here
+# MAIN SEQUENCE BEGIN
 config = configparser.ConfigParser()
 config.read('cf.conf')                              # read configuration file cf.conf
 username = config.get('Credentials', 'User')        # The user's callsign is read from cf.conf
@@ -74,11 +87,11 @@ else:
     sid = config.get('Session', 'SID')              # Read existing session ID from cf.conf
     print('Existing session found\nSession ID: {}'.format(sid))
 
-# Begin main loop
+# MAIN LOOP BEGIN
 while True:
     callsign = inputcallsign()  # call function for user input and input validation
     callsign_results = fetchcallsigndata(sid, callsign) # using session ID and callsign, request info from API and return as dict
-    # insert function to print desired info here
+    print_callsign_info([], callsign_results)   # Print results from API request in human-friendly formatting
     # Ask if we want to lookup another callsign
     again = input("Do you want to lookup another callsign? (y/n) ").lower()
     if again == 'y':
