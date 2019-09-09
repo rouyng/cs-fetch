@@ -4,13 +4,12 @@
 
 import configparser
 import sys
+import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from datetime import timedelta
 
-import requests
-
-# BEGIN FUNCTION DEFINITIONS
+## BEGIN FUNCTION DEFINITIONS
 
 # This function requests a new session from the HamQTH API
 def getsession():
@@ -42,15 +41,13 @@ def inputcallsign():
         else:
             return callsign
 
-# This function requests information from the HamQTH API given a valid session ID
-# TODO: make this function return csdict and have printing be done in a different function. For increased modularity
-# TODO: make this function take session ID and callsign as arguments, rather than calling specific variable names
-def fetchcallsigndata():
-    callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(sid, csign))
+# This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
+def fetchcallsigndata(session_id, callsign):
+    callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(session_id, callsign))
     callsignreq.raise_for_status()      #check whether HTTP request was successful
     csroot = ET.fromstring(callsignreq.content)
     qtherror = csroot.find('*/{https://www.hamqth.com}error')
-    if qtherror != None:
+    if qtherror:
         print('HamQTH Error: {}'.format(qtherror.text))
         return False
     else:
@@ -58,60 +55,48 @@ def fetchcallsigndata():
         for child in csroot[0]:
             tag = child.tag
             csdict[tag.split('}')[1]] = child.text
-        try:
-            print('Nickname: {}'.format(csdict['nick']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Name (from address): {}'.format(csdict['adr_name']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('QTH: {}'.format(csdict['qth']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Country: {}'.format(csdict['country']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Grid: {}'.format(csdict['grid']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        try:
-            print('Email: {}'.format(csdict['email']))
-        except KeyError as e:
-            print('{} is not in HamQTH database'.format(e))
-        again = ''
-        while again not in ['y', 'n']:
-            again = input("Do you want to lookup another callsign? (y/n) ").lower()
-            if again == 'y':
-                return False
-                break
-            elif again == 'n':
-                return True
-                break
-            else:
-                continue
-# END FUNCTION DEFINITIONS
+    return csdict
 
-# Main sequence of program begins here
+# This function prints selected fields from the dict returned by fetchcallsign data, along with human-friendly labels
+def print_callsign_info(print_these_fields, callsign_dictionary):
+    if not print_these_fields:  # if no parameter is passed, populate this list with default values
+        print_these_fields = ['nick', 'qth', 'grid', 'email'] # these are the fields that will be printed by default
+    # field_labels dict contains the human-friendly labels for each field the API may return
+    field_labels = {'nick': 'Nickname',
+                    'adr_name' : 'Name (from address)',
+                    'qth' : 'QTH',
+                    'country' : 'Country',
+                    'grid' : 'Grid Square',
+                    'email' : 'Email address'}
+    for key in print_these_fields & field_labels.keys() & callsign_dictionary.keys():
+        print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
+
+## END FUNCTION DEFINITIONS
+
+## MAIN SEQUENCE BEGIN
 config = configparser.ConfigParser()
 config.read('cf.conf')                              # read configuration file cf.conf
-username = config.get('Credentials', 'User')        # The user's callsign
-password = config.get('Credentials', 'Password')    # HamQTH password
-expireTime = config.get('Session', 'EXP')           # Session expiration date/time
+username = config.get('Credentials', 'User')        # The user's callsign is read from cf.conf
+password = config.get('Credentials', 'Password')    # HamQTH password is read from cf.conf
+expireTime = config.get('Session', 'EXP')           # Existing session expiration date/time read from cf.conf
 
+# If there is no saved session, or saved session is expired, run getsession
 if expireTime == '' or datetime.now() >= datetime.strptime(expireTime.split('.')[0], '%Y-%m-%d %H:%M:%S'):
     sid = getsession()
 else:
-    sid = config.get('Session', 'SID')              # Existing session ID
+    sid = config.get('Session', 'SID')              # Read existing session ID from cf.conf
     print('Existing session found\nSession ID: {}'.format(sid))
 
 while True:
-    csign = inputcallsign()
-    if not fetchcallsigndata():
+    callsign = inputcallsign()  # call function for user input and input validation
+    callsign_results = fetchcallsigndata(sid, callsign) # using session ID and callsign, request info from API and return as dict
+    print_callsign_info([], callsign_results)   # Print results from API request in human-friendly formatting
+    # Ask if we want to lookup another callsign
+    again = input("Do you want to lookup another callsign? (y/n) ").lower()
+    if again == 'y':
         continue
-    else:
+    elif again == 'n':
+        print('Exit!')
         break
+
 
