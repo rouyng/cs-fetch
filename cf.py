@@ -4,6 +4,7 @@
 
 import configparser
 import sys
+import json
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -23,9 +24,9 @@ def getsession():
         sys.exit(1)         # exit if credentials are wrong. eventually will implement input prompts for new credentials
     else:
         expireTime = datetime.now() + timedelta(hours = 1)
-        config.set('Session', 'SID', str(sessionID))
-        config.set('Session', 'EXP', str(expireTime))
-        config.write(open('cf.conf','w'))
+        session_dict = {'SID' : str(sessionID), 'EXP' : str(expireTime)}
+        with open('session.json', 'w') as f:    # store session_dict in JSON file
+            json.dump(session_dict, f)
         print('Connected to HamQTH.com as {}\nSession ID: {}\nExpires {}'.format(username, sessionID, expireTime.strftime('%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
         return sessionID
 
@@ -78,14 +79,18 @@ config = configparser.ConfigParser()
 config.read('cf.conf')                              # read configuration file cf.conf
 username = config.get('Credentials', 'User')        # The user's callsign is read from cf.conf
 password = config.get('Credentials', 'Password')    # HamQTH password is read from cf.conf
-expireTime = config.get('Session', 'EXP')           # Existing session expiration date/time read from cf.conf
 
-# If there is no saved session, or saved session is expired, run getsession
-if expireTime == '' or datetime.now() >= datetime.strptime(expireTime.split('.')[0], '%Y-%m-%d %H:%M:%S'):
+try:
+    with open('session.json') as f:
+        existing_session = json.load(f)
+        expire_time = existing_session['EXP'] # Existing session expiration date/time read from session.json
+        sid = existing_session['SID'] # Existing session ID read from session.json
+        if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
+            sid = getsession()
+        else:
+            print('Existing session found\nSession ID: {}'.format(sid))
+except FileNotFoundError:
     sid = getsession()
-else:
-    sid = config.get('Session', 'SID')              # Read existing session ID from cf.conf
-    print('Existing session found\nSession ID: {}'.format(sid))
 
 while True:
     callsign = inputcallsign()  # call function for user input and input validation
