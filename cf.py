@@ -15,20 +15,23 @@ from datetime import timedelta
 # This function requests a new session from the HamQTH API
 def getsession():
     sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
-    sessionReq.raise_for_status()               # check whether HTTP request was successful
+    sessionReq.raise_for_status()  # check whether HTTP request was successful
     ## need to handle exception for timeouts/network errors etc here, add retry loop
-    root = ET.fromstring(sessionReq.content)    # get XML tree from HTTPS request results
+    root = ET.fromstring(sessionReq.content)  # get XML tree from HTTPS request results
     sessionID = root[0][0].text
     if sessionID == 'Wrong user name or password':
         print("Wrong user name or password! Please enter valid HamQTH.com credentials in cf.conf")
-        sys.exit(1)         # exit if credentials are wrong. eventually will implement input prompts for new credentials
+        sys.exit(1)  # exit if credentials are wrong. eventually will implement input prompts for new credentials
     else:
-        expireTime = datetime.now() + timedelta(hours = 1)
-        session_dict = {'SID' : str(sessionID), 'EXP' : str(expireTime)}
-        with open('session.json', 'w') as f:    # store session_dict in JSON file
+        expireTime = datetime.now() + timedelta(hours=1)
+        session_dict = {'SID': str(sessionID), 'EXP': str(expireTime)}
+        with open('session.json', 'w') as f:  # store session_dict in JSON file
             json.dump(session_dict, f)
-        print('Connected to HamQTH.com as {}\nSession ID: {}\nExpires {}'.format(username, sessionID, expireTime.strftime('%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
+        print('Connected to HamQTH.com as {}\nSession ID: {}\nExpires {}'.format(username, sessionID,
+                                                                                 expireTime.strftime(
+                                                                                     '%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
         return sessionID
+
 
 # This function validates input of callsign to be looked up, additional validation will be added here later
 def inputcallsign():
@@ -42,10 +45,12 @@ def inputcallsign():
         else:
             return callsign
 
+
 # This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
 def fetchcallsigndata(session_id, callsign):
-    callsignreq = requests.get('https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(session_id, callsign))
-    callsignreq.raise_for_status()      #check whether HTTP request was successful
+    callsignreq = requests.get(
+        'https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(session_id, callsign))
+    callsignreq.raise_for_status()  # check whether HTTP request was successful
     csroot = ET.fromstring(callsignreq.content)
     qtherror = csroot.find('*/{https://www.hamqth.com}error')
     if qtherror:
@@ -58,33 +63,84 @@ def fetchcallsigndata(session_id, callsign):
             csdict[tag.split('}')[1]] = child.text
     return csdict
 
+
 # This function prints selected fields from the dict returned by fetchcallsign data, along with human-friendly labels
-def print_callsign_info(print_these_fields, callsign_dictionary):
-    if not print_these_fields:  # if no parameter is passed, populate this list with default values
-        print_these_fields = ['nick', 'qth', 'grid', 'email'] # these are the fields that will be printed by default
+def print_callsign_info(callsign_dictionary, print_these_fields=['adr_name']):
     # field_labels dict contains the human-friendly labels for each field the API may return
-    field_labels = {'nick': 'Nickname',
-                    'adr_name' : 'Name (from address)',
-                    'qth' : 'QTH',
-                    'country' : 'Country',
-                    'grid' : 'Grid Square',
-                    'email' : 'Email address'}
-    for key in print_these_fields & field_labels.keys() & callsign_dictionary.keys():
-        print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
+    field_labels = {'callsign': 'Callsign',
+                    'nick': 'Nickname',
+                    'qth': 'QTH',
+                    'country': 'Country',
+                    'adif': 'ADIF ID',
+                    'itu': 'ITU',
+                    'CQ': 'CQ (WAZ) zone',
+                    'grid': 'Grid Square',
+                    'adr_name': 'Name (from address)',
+                    'adr_street1': 'Address 1',
+                    'adr_street2': 'Address 2',
+                    'adr_street3': 'Address 3',
+                    'adr_city': 'City',
+                    'adr_zip': 'Zip code',
+                    'adr_country': 'Country (from address)',
+                    'adr_adif': 'ADIF (from address)',
+                    'district': 'District',
+                    'us_state': 'State (USA)',
+                    'us_county': 'County (USA)',
+                    'oblast': 'Oblast (RUS)',
+                    'dok': 'DOK',
+                    'iota': 'IOTA #',
+                    'qsl_via': 'QSL Info',
+                    'lotw': 'Uses LOTW?',
+                    'eqsl': 'Uses EQSL?',
+                    'qsl' : 'Accept QSL via bureau?',
+                    'qsldirect': 'Accept direct QSL card?',
+                    'email': 'Email address',
+                    'jabber': 'Jabber',
+                    'icq': 'ICQ',
+                    'msn': 'MSN',
+                    'skype': 'Skype',
+                    'birth_year': 'Year of birth',
+                    'lic_year': 'Licensed since',
+                    'picture': "URL to user's photo",
+                    'latitude': 'Latitude',
+                    'longitude': 'Longitude',
+                    'continent': 'Continent',
+                    'utc_offset': 'Offset to UTC time',
+                    'facebook': 'Facebook URL',
+                    'twitter': 'Twitter URL',
+                    'gplus': 'Google Plus URL',
+                    'youtube': 'YouTube URL',
+                    'linkedin': 'LinkedIn URL',
+                    'flicker': 'Flickr URL',
+                    'vimeo': 'Vimeo URL'
+                    }
+    for key in print_these_fields:
+        if key in field_labels.keys() & callsign_dictionary.keys():
+            print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
+
+def get_fields_to_print(configuration_file):
+    config = configparser.ConfigParser()
+    config.read(configfile)
+    field_list = []
+    fields = config.options('Fields')
+    for f in fields:
+        field_list.append(f)
+    return field_list
 
 ## END FUNCTION DEFINITIONS
 
 ## MAIN SEQUENCE BEGIN
+configfile = 'cf.conf'
 config = configparser.ConfigParser()
-config.read('cf.conf')                              # read configuration file cf.conf
-username = config.get('Credentials', 'User')        # The user's callsign is read from cf.conf
-password = config.get('Credentials', 'Password')    # HamQTH password is read from cf.conf
+config.read(configfile)  # read configuration file cf.conf
+username = config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
+password = config.get('Credentials', 'Password')  # HamQTH password is read from cf.conf
 
 try:
     with open('session.json') as f:
         existing_session = json.load(f)
-        expire_time = existing_session['EXP'] # Existing session expiration date/time read from session.json
-        sid = existing_session['SID'] # Existing session ID read from session.json
+        expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
+        sid = existing_session['SID']  # Existing session ID read from session.json
         if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
             sid = getsession()
         else:
@@ -94,8 +150,10 @@ except FileNotFoundError:
 
 while True:
     callsign = inputcallsign()  # call function for user input and input validation
-    callsign_results = fetchcallsigndata(sid, callsign) # using session ID and callsign, request info from API and return as dict
-    print_callsign_info([], callsign_results)   # Print results from API request in human-friendly formatting
+    callsign_results = fetchcallsigndata(sid,
+                                         callsign)  # using session ID and callsign, request info from API and return as dict
+    print_callsign_info(callsign_results,
+                        get_fields_to_print(configfile))  # Print results from API request in human-friendly formatting
     # Ask if we want to lookup another callsign
     again = input("Do you want to lookup another callsign? (y/n) ").lower()
     if again == 'y':
@@ -103,5 +161,3 @@ while True:
     elif again == 'n':
         print('Exit!')
         break
-
-
