@@ -19,7 +19,7 @@ This is a basic Python script primarily written as a practice exercise, suggesti
 ## Use
 Tested with Python 3.7.0
 
-Edit cf.conf with your HamQTH.com credentials before running. You must have a HamQTH account for the script to work! The fields under the "Session" section should be left blank, these are used by the script to store session information.
+Edit cf.conf with your HamQTH.com credentials before running. You must have a HamQTH account for the script to work!
 
 ```
 pip3 install -r requirements.txt
