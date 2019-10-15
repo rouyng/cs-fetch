@@ -8,6 +8,7 @@ This script interactively takes amateur (ham) radio callsigns as an input, looks
 
 Features include:
 - reading credentials from a configuration file
+- can configure which fields are returned and their order, from configuration file
 - storing and recalling an active session if the script is stopped
 - HTTP request error handling
 - simple validation of input based on length
