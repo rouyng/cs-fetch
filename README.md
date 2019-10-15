@@ -19,12 +19,17 @@ This is a basic Python script primarily written as a practice exercise, suggesti
 ## Use
 Tested with Python 3.7.0
 
-Edit cf.conf with your HamQTH.com credentials before running. You must have a HamQTH account for the script to work! The fields under the "Session" section should be left blank, these are used by the script to store session information.
+Before running, add your HamQTH.com credentials to the `[Credentials]` section in `cf.conf`. 
+You must have your own HamQTH account for the script to work!
 
+To run, from the installation directory:
 ```
 pip3 install -r requirements.txt
-python -m cf.py
+python -m cf
 ```
+
+By default the script will print all fields returned by HamQTH that are not empty. This can be configured by commenting
+out lines under `[Fields]` in `cf.conf`. The order in which fields are printed can also be changed by reordering this section.
 
 ## Important Files
 - `cf.py`: This is the script
@@ -32,7 +37,6 @@ python -m cf.py
 - `requirements.txt`: python requirements file
 
 ## TODO
-- Currently the choice of specific fields returned from HamQTH is hardcoded. Planning on making this configurable by modifying lines in the config file.
 - Need to automatically request a new session if the current session expires while the script is running.
 - More sophisticated input validation based on all possible valid callsign formats
 - Refactor some functions to separate out web requests and output to user?
