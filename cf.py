@@ -6,6 +6,7 @@ import configparser
 import sys
 import json
 import requests
+import string
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from datetime import timedelta
@@ -14,36 +15,41 @@ from datetime import timedelta
 
 # This function requests a new session from the HamQTH API
 def getsession():
-    sessionReq = requests.get('https://www.hamqth.com/xml.php?u={}&p={}'.format(username, password))
+    sessionReq = requests.get(f'https://www.hamqth.com/xml.php?u={username}&p={password}')
     sessionReq.raise_for_status()  # check whether HTTP request was successful
     ## need to handle exception for timeouts/network errors etc here, add retry loop
     root = ET.fromstring(sessionReq.content)  # get XML tree from HTTPS request results
     sessionID = root[0][0].text
     if sessionID == 'Wrong user name or password':
         print("Wrong user name or password! Please enter valid HamQTH.com credentials in cf.conf")
-        sys.exit(1)  # exit if credentials are wrong. eventually will implement input prompts for new credentials
+        sys.exit(1)  # exit if credentials are wrong
     else:
         expireTime = datetime.now() + timedelta(hours=1)
         session_dict = {'SID': str(sessionID), 'EXP': str(expireTime)}
         with open('session.json', 'w') as f:  # store session_dict in JSON file
             json.dump(session_dict, f)
-        print('Connected to HamQTH.com as {}\nSession ID: {}\nExpires {}'.format(username, sessionID,
-                                                                                 expireTime.strftime(
-                                                                                     '%H:%M:%S')))  # session is valid for one hour, print expiration time when new session is requested
+        exp_formatted = expireTime.strftime('%H:%M:%S')
+        print(f'Connected to HamQTH.com as {username}\nSession ID: {sessionID}\nExpires {exp_formatted}')  # session is valid for one hour, print expiration time when new session is requested
         return sessionID
 
-
-# This function validates input of callsign to be looked up, additional validation will be added here later
 def inputcallsign():
-    callsign = ''
+	# This function accepts input of callsign to be looked up, validates it according to callsign conventions, then returns the callsign string if validation passes
+    cs_err = '' # this string stores any callsign validation error
     while True:
-        callsign = input('Enter Callsign to Lookup:')
-        if len(callsign) < 3 or len(callsign) > 7:
-            print('{} does not appear to be a valid callsign format, please try again.'.format(callsign))
-            callsign = ''
+    	callsign = '' # callsign input stored in this string
+    	print(cs_err) # print any validation error from previous input
+    	callsign = input('Enter Callsign to Lookup: ')
+    	for c in callsign:
+        	if c not in string.digits and c not in string.ascii_letters:
+        		cs_err = f'{callsign} does not appear to be a valid callsign format (contains invalid character)'
+        		continue
+		if len(callsign) < 3:
+			cs_err = f'{callsign} does not appear to be a valid callsign format (too short)'
             continue
-        else:
-            return callsign
+        elif len(callsign) > 7:
+        	cs_err = f'{callsign} does not appear to be a valid callsign format (too long)'
+        	continue  
+	return callsign
 
 
 # This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
