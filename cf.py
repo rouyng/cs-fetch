@@ -35,22 +35,22 @@ def getsession():
 def inputcallsign():
     # This function accepts input of callsign to be looked up, validates it according to callsign conventions, then returns the callsign string if validation passes
     cs_err = '' # this string stores any callsign validation error
+    valid_chars = string.digits + string.ascii_letters
     while True:
-        callsign = '' # callsign input stored in this string
+        cs = '' # callsign input stored in this string
         print(cs_err) # print any validation error from previous input
-        callsign = input('Enter Callsign to Lookup: ')
-        for c in callsign:
-            if c not in string.digits and c not in string.ascii_letters:
-                cs_err = f'{callsign} does not appear to be a valid callsign format (contains invalid character)'
-                continue
-        if len(callsign) < 3:
-            cs_err = f'{callsign} does not appear to be a valid callsign format (too short)'
+        cs = input('Enter Callsign to Lookup: ')
+        if any(c not in valid_chars for c in cs):
+            cs_err = f'{cs} does not appear to be a valid callsign format (contains invalid character)'
             continue
-        elif len(callsign) > 7:
-            cs_err = f'{callsign} does not appear to be a valid callsign format (too long)'
+        if len(cs) < 3:
+            cs_err = f'{cs} does not appear to be a valid callsign format (too short)'
+            continue
+        elif len(cs) > 7:
+            cs_err = f'{cs} does not appear to be a valid callsign format (too long)'
             continue
         break
-    return callsign
+    return cs
 
 
 # This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
