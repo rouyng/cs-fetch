@@ -35,12 +35,12 @@ def getsession():
 def inputcallsign():
     # This function accepts input of callsign to be looked up, validates it according to callsign conventions, then returns the callsign string if validation passes
     cs_err = '' # this string stores any callsign validation error
-    valid_chars = string.digits + string.ascii_letters
+    valid_chars = string.digits + string.ascii_letters # callsigns should only contain letters and digits
     while True:
         cs = '' # callsign input stored in this string
         print(cs_err) # print any validation error from previous input
         cs = input('Enter Callsign to Lookup: ')
-        if any(c not in valid_chars for c in cs):
+        if any(c not in valid_chars for c in cs): # check if any invalid characters are present in the input
             cs_err = f'{cs} does not appear to be a valid callsign format (contains invalid character)'
             continue
         if len(cs) < 3:
@@ -49,7 +49,7 @@ def inputcallsign():
         elif len(cs) > 7:
             cs_err = f'{cs} does not appear to be a valid callsign format (too long)'
             continue
-        break
+        # TODO: add only letters/only digits validation
     return cs
 
 
