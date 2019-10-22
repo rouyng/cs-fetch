@@ -26,8 +26,8 @@ def getsession():
     else:
         expireTime = datetime.now() + timedelta(hours=1)
         session_dict = {'SID': str(sessionID), 'EXP': str(expireTime)}
-        with open('session.json', 'w') as f:  # store session_dict in JSON file
-            json.dump(session_dict, f)
+        with open('session.json', 'w') as e:  # store session_dict in JSON file
+            json.dump(session_dict, e)
         exp_formatted = expireTime.strftime('%H:%M:%S')
         print(f'Connected to HamQTH.com as {username}\nSession ID: {sessionID}\nExpires {exp_formatted}')  # session is valid for one hour, print expiration time when new session is requested
         return sessionID
@@ -43,13 +43,17 @@ def inputcallsign():
         if any(c not in valid_chars for c in cs): # check if any invalid characters are present in the input
             cs_err = f'{cs} does not appear to be a valid callsign format (contains invalid character)'
             continue
-        if len(cs) < 3:
+        elif len(cs) < 3:
             cs_err = f'{cs} does not appear to be a valid callsign format (too short)'
             continue
         elif len(cs) > 7:
             cs_err = f'{cs} does not appear to be a valid callsign format (too long)'
             continue
-        # TODO: add only letters/only digits validation
+        elif not any(d in cs for d in string.digits) or not any(l in cs for l in string.ascii_letters):
+            cs_err = f'{cs} does not appear to be a valid callsign format (callsigns must contain both letters and digits)'
+            continue
+        else:
+            break
     return cs
 
 
