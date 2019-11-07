@@ -34,7 +34,7 @@ def getsession():
 
 def inputcallsign():
     # This function accepts input of callsign to be looked up, validates it according to callsign conventions, then returns the callsign string if validation passes
-    cs_err = '' # this string stores any callsign validation error
+    cs_err = ''  # this string stores any callsign validation error
     valid_chars = string.digits + string.ascii_letters # callsigns should only contain letters and digits
     while True:
         cs = '' # callsign input stored in this string
