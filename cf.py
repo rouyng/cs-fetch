@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from datetime import timedelta
 
+
 ## BEGIN FUNCTION DEFINITIONS
 
 # This function requests a new session from the HamQTH API
@@ -29,18 +30,20 @@ def getsession():
         with open('session.json', 'w') as e:  # store session_dict in JSON file
             json.dump(session_dict, e)
         exp_formatted = expireTime.strftime('%H:%M:%S')
-        print(f'Connected to HamQTH.com as {username}\nSession ID: {sessionID}\nExpires {exp_formatted}')  # session is valid for one hour, print expiration time when new session is requested
+        print(
+            f'Connected to HamQTH.com as {username}\nSession ID: {sessionID}\nExpires {exp_formatted}')  # session is valid for one hour, print expiration time when new session is requested
         return sessionID
+
 
 def inputcallsign():
     # This function accepts input of callsign to be looked up, validates it according to callsign conventions, then returns the callsign string if validation passes
     cs_err = ''  # this string stores any callsign validation error
-    valid_chars = string.digits + string.ascii_letters # callsigns should only contain letters and digits
+    valid_chars = string.digits + string.ascii_letters  # callsigns should only contain letters and digits
     while True:
-        cs = '' # callsign input stored in this string
-        print(cs_err) # print any validation error from previous input
+        cs = ''  # callsign input stored in this string
+        print(cs_err)  # print any validation error from previous input
         cs = input('Enter Callsign to Lookup: ')
-        if any(c not in valid_chars for c in cs): # check if any invalid characters are present in the input
+        if any(c not in valid_chars for c in cs):  # check if any invalid characters are present in the input
             cs_err = f'{cs} does not appear to be a valid callsign format (contains invalid character)'
             continue
         elif len(cs) < 3:
@@ -103,7 +106,7 @@ def print_callsign_info(callsign_dictionary, print_these_fields=['adr_name']):
                     'qsl_via': 'QSL Info',
                     'lotw': 'Uses LOTW?',
                     'eqsl': 'Uses EQSL?',
-                    'qsl' : 'Accept QSL via bureau?',
+                    'qsl': 'Accept QSL via bureau?',
                     'qsldirect': 'Accept direct QSL card?',
                     'email': 'Email address',
                     'jabber': 'Jabber',
@@ -129,6 +132,7 @@ def print_callsign_info(callsign_dictionary, print_these_fields=['adr_name']):
         if key in field_labels.keys() & callsign_dictionary.keys():
             print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
 
+
 def get_fields_to_print(configuration_file):
     config = configparser.ConfigParser()
     config.read(configfile)
@@ -138,37 +142,41 @@ def get_fields_to_print(configuration_file):
         field_list.append(f)
     return field_list
 
+
 ## END FUNCTION DEFINITIONS
 
 ## MAIN SEQUENCE BEGIN
-configfile = 'cf.conf'
-config = configparser.ConfigParser()
-config.read(configfile)  # read configuration file cf.conf
-username = config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
-password = config.get('Credentials', 'Password')  # HamQTH password is read from cf.conf
 
-try:
-    with open('session.json') as f:
-        existing_session = json.load(f)
-        expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
-        sid = existing_session['SID']  # Existing session ID read from session.json
-        if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
-            sid = getsession()
-        else:
-            print('Existing session found\nSession ID: {}'.format(sid))
-except FileNotFoundError:
-    sid = getsession()
+if __name__ == "__main__":
+    configfile = 'cf.conf'
+    config = configparser.ConfigParser()
+    config.read(configfile)  # read configuration file cf.conf
+    username = config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
+    password = config.get('Credentials', 'Password')  # HamQTH password is read from cf.conf
 
-while True:
-    callsign = inputcallsign()  # call function for user input and input validation
-    callsign_results = fetchcallsigndata(sid,
-                                         callsign)  # using session ID and callsign, request info from API and return as dict
-    print_callsign_info(callsign_results,
-                        get_fields_to_print(configfile))  # Print results from API request in human-friendly formatting
-    # Ask if we want to lookup another callsign
-    again = input("Do you want to lookup another callsign? (y/n) ").lower()
-    if again == 'y':
-        continue
-    elif again == 'n':
-        print('Exit!')
-        break
+    try:
+        with open('session.json') as f:
+            existing_session = json.load(f)
+            expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
+            sid = existing_session['SID']  # Existing session ID read from session.json
+            if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
+                sid = getsession()
+            else:
+                print('Existing session found\nSession ID: {}'.format(sid))
+    except FileNotFoundError:
+        sid = getsession()
+
+    while True:
+        callsign = inputcallsign()  # call function for user input and input validation
+        callsign_results = fetchcallsigndata(sid,
+                                             callsign)  # using session ID and callsign, request info from API and return as dict
+        print_callsign_info(callsign_results,
+                            get_fields_to_print(
+                                configfile))  # Print results from API request in human-friendly formatting
+        # Ask if we want to lookup another callsign
+        again = input("Do you want to lookup another callsign? (y/n) ").lower()
+        if again == 'y':
+            continue
+        elif again == 'n':
+            print('Exit!')
+            break
