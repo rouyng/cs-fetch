@@ -27,6 +27,7 @@ class cfgui(QMainWindow):
         self._createStatusBar()
         self._createcsentry()
         self._createsearchbutton()
+        self._createclearbutton()
         self._createsearchoutput()
 
     def _createMenu(self):
@@ -46,6 +47,10 @@ class cfgui(QMainWindow):
         self.searchbutton = QPushButton('Search')
         self.layout.addWidget(self.searchbutton, 1, 1)
 
+    def _createclearbutton(self):
+        self.clearbutton = QPushButton('Clear')
+        self.layout.addWidget(self.clearbutton, 3, 0, 1, 2)
+
     def _createsearchoutput(self):
         self.searchoutput = QTextEdit()
         self.searchoutput.setReadOnly(True)
@@ -55,12 +60,31 @@ class cfgui(QMainWindow):
     def setOutputText(self, text):
         self.searchoutput.setText(text)
 
+    def appendOutputText(self, text):
+        self.searchoutput.append(text)
+
     def clearOutputText(self):
         self.setOutputText('')
+
+class cfguicontrol:
+    """Cs-Fetch GUI controller class"""
+    def __init__(self, view):
+        self._view = view
+        self._connectSignals()
+
+    def _connectSignals(self):
+        #self._view.searchbutton.clicked.connect()
+        self._view.clearbutton.clicked.connect(self._view.clearOutputText)
+        self._view.searchbutton.clicked.connect(self.getcsinput)
+
+    def getcsinput(self):
+        csinput = self._view.csentry.text()
+        print(csinput)
 
 if __name__ == '__main__':
     app = QApplication([])
     gui = cfgui()
     gui.show()
     gui.setOutputText('Hello World!')
+    controller = cfguicontrol(view=gui)
     sys.exit(app.exec_())
