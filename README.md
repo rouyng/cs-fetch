@@ -39,8 +39,7 @@ out lines under `[Fields]` in `cf.conf`. The order in which fields are printed c
 
 ## TODO
 - Need to automatically request a new session if the current session expires while the script is running.
-- More sophisticated input validation based on all possible valid callsign formats
-- Refactor some functions to separate out web requests and output to user?
+- PyQt5 Gui (in progress, see [pyqt-gui branch](https://github.com/rouyng/callsign-fetch/tree/pyqt-gui))
 
 ## License
 This project is released under the terms of the GNU GPL v3.0. See LICENSE file for details.
