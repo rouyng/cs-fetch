@@ -9,9 +9,10 @@ from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QStatusBar
 from PyQt5.QtWidgets import QTextEdit
+import cf
 
 
-class cfgui(QMainWindow):
+class CfGui(QMainWindow):
     """Mail CSFetch application window"""
     def __init__(self, parent=None):
         """Initializer"""
@@ -23,21 +24,21 @@ class cfgui(QMainWindow):
         self.layout = QGridLayout()
         self.layout.addWidget(QLabel("Welcome to CSFetch!"), 0, 0, 1, 2)
         self._centralWidget.setLayout(self.layout)
-        self._createMenu()
-        self._createStatusBar()
+        self._createmenu()
+        self._createstatusbar()
         self._createcsentry()
         self._createsearchbutton()
         self._createclearbutton()
         self._createsearchoutput()
 
-    def _createMenu(self):
+    def _createmenu(self):
         self.menu = self.menuBar().addMenu("&File")
         self.menu = self.menuBar().addMenu("&Options")
 
-    def _createStatusBar(self):
-        status = QStatusBar()
-        status.showMessage("Here is the status bar.")
-        self.setStatusBar(status)
+    def _createstatusbar(self):
+        self.status = QStatusBar()
+        self.status.showMessage("Here is the status bar.")
+        self.setStatusBar(self.status)
 
     def _createcsentry(self):
         self.csentry = QLineEdit('Callsign')
@@ -66,7 +67,10 @@ class cfgui(QMainWindow):
     def clearOutputText(self):
         self.setOutputText('')
 
-class cfguicontrol:
+    def setstatustext(self, text):
+        self.status.showMessage(text)
+
+class CfGuiControl:
     """Cs-Fetch GUI controller class"""
     def __init__(self, view):
         self._view = view
@@ -78,13 +82,20 @@ class cfguicontrol:
         self._view.searchbutton.clicked.connect(self.getcsinput)
 
     def getcsinput(self):
-        csinput = self._view.csentry.text()
-        print(csinput)
+        self.csinput = self._view.csentry.text()
+        cf.
+
+    def displaysession(self, sessionid):
+        self._view.setstatustext(f'Session ID: {sessionid}')
+
 
 if __name__ == '__main__':
+    configfile = 'cf.conf'
+    session = cf.initialize(configfile)
     app = QApplication([])
-    gui = cfgui()
+    gui = CfGui()
     gui.show()
     gui.setOutputText('Hello World!')
-    controller = cfguicontrol(view=gui)
+    controller = CfGuiControl(view=gui)
+    controller.displaysession(session)
     sys.exit(app.exec_())

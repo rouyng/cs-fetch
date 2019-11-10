@@ -29,11 +29,14 @@ pip3 install -r requirements.txt
 python -m cf
 ```
 
+Substitute cf-gui for cf if you want to run the GUI version (currently under development).
+
 By default the script will print all fields returned by HamQTH that are not empty. This can be configured by commenting
 out lines under `[Fields]` in `cf.conf`. The order in which fields are printed can also be changed by reordering this section.
 
 ## Important Files
-- `cf.py`: This is the script
+- `cf.py`: This is the script (command line version)
+- `cf-gui.py` Script (GUI version)
 - `cf.conf`: This is the configuration file for the script, enter your HamQTH.com credentials here before use.
 - `requirements.txt`: python requirements file
 

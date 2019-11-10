@@ -15,7 +15,7 @@ from datetime import timedelta
 ## BEGIN FUNCTION DEFINITIONS
 
 # This function requests a new session from the HamQTH API
-def getsession():
+def getsession(username, password):
     sessionReq = requests.get(f'https://www.hamqth.com/xml.php?u={username}&p={password}')
     sessionReq.raise_for_status()  # check whether HTTP request was successful
     ## need to handle exception for timeouts/network errors etc here, add retry loop
@@ -133,7 +133,7 @@ def print_callsign_info(callsign_dictionary, print_these_fields=['adr_name']):
             print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
 
 
-def get_fields_to_print(configuration_file):
+def get_fields_to_print(configfile):
     config = configparser.ConfigParser()
     config.read(configfile)
     field_list = []
@@ -143,12 +143,8 @@ def get_fields_to_print(configuration_file):
     return field_list
 
 
-## END FUNCTION DEFINITIONS
-
-## MAIN SEQUENCE BEGIN
-
-if __name__ == "__main__":
-    configfile = 'cf.conf'
+def initialize(configfile):
+    # Reads credentials from config file and establishes a new/existing session
     config = configparser.ConfigParser()
     config.read(configfile)  # read configuration file cf.conf
     username = config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
@@ -160,20 +156,25 @@ if __name__ == "__main__":
             expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
             sid = existing_session['SID']  # Existing session ID read from session.json
             if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
-                sid = getsession()
+                sid = getsession(username, password)
             else:
                 print('Existing session found\nSession ID: {}'.format(sid))
     except FileNotFoundError:
-        sid = getsession()
+        sid = getsession(username, password)
+    return sid
 
+## END FUNCTION DEFINITIONS
+
+## MAIN SEQUENCE BEGIN
+
+if __name__ == "__main__":
+    configfile = 'cf.conf'
+    session = initialize(configfile)
     while True:
         callsign = inputcallsign()  # call function for user input and input validation
-        callsign_results = fetchcallsigndata(sid,
-                                             callsign)  # using session ID and callsign, request info from API and return as dict
-        print_callsign_info(callsign_results,
-                            get_fields_to_print(
-                                configfile))  # Print results from API request in human-friendly formatting
-        # Ask if we want to lookup another callsign
+        callsign_results = fetchcallsigndata(session, callsign)  # request info from API and return as dict
+        print_callsign_info(callsign_results, get_fields_to_print(configfile))  # Print results from API request
+        # Ask if we want to look up another callsign
         again = input("Do you want to lookup another callsign? (y/n) ").lower()
         if again == 'y':
             continue
