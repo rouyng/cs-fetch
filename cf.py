@@ -35,30 +35,24 @@ def getsession(username, password):
         return sessionID
 
 
-def inputcallsign():
-    # This function accepts input of callsign to be looked up, validates it according to callsign conventions, then returns the callsign string if validation passes
+def validatecallsing(cs):
+    # This function accepts input of callsign to be looked up and checks it against callsign conventions
+    # returns True if it appears to be valid, otherwise it prints an error message and returns False
     cs_err = ''  # this string stores any callsign validation error
     valid_chars = string.digits + string.ascii_letters  # callsigns should only contain letters and digits
-    while True:
-        cs = ''  # callsign input stored in this string
-        print(cs_err)  # print any validation error from previous input
-        cs = input('Enter Callsign to Lookup: ')
+    while cs_err == '':
         if any(c not in valid_chars for c in cs):  # check if any invalid characters are present in the input
             cs_err = f'{cs} does not appear to be a valid callsign format (contains invalid character)'
-            continue
         elif len(cs) < 3:
             cs_err = f'{cs} does not appear to be a valid callsign format (too short)'
-            continue
         elif len(cs) > 7:
             cs_err = f'{cs} does not appear to be a valid callsign format (too long)'
-            continue
         elif not any(d in cs for d in string.digits) or not any(l in cs for l in string.ascii_letters):
             cs_err = f'{cs} does not appear to be a valid callsign format (callsigns must contain both letters and digits)'
-            continue
         else:
-            break
-    return cs
-
+            return True
+    print(cs_err)
+    return False
 
 # This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
 def fetchcallsigndata(session_id, callsign):
@@ -170,8 +164,15 @@ def initialize(configfile):
 if __name__ == "__main__":
     configfile = 'cf.conf'
     session = initialize(configfile)
+    callsign = ''
     while True:
-        callsign = inputcallsign()  # call function for user input and input validation
+        while True:
+            user_input = input('Enter Callsign to Lookup: ')
+            if validatecallsing(user_input) == True:
+                callsign = user_input
+                break
+            else:
+                continue
         callsign_results = fetchcallsigndata(session, callsign)  # request info from API and return as dict
         print_callsign_info(callsign_results, get_fields_to_print(configfile))  # Print results from API request
         # Ask if we want to look up another callsign
