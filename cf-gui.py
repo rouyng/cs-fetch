@@ -18,17 +18,22 @@ class CfGuiControl:
         self._view = view
         self._results = {}
         self._connectSignals()
+        self._csinput = None
 
     def _connectSignals(self):
         #self._view.clearbutton.clicked.connect(self._view.clearOutputText)
         self._view.searchbutton.clicked.connect(self.getcsinput)
 
     def getcsinput(self):
-        self.csinput = self._view.searchinput.text()
-         self._results = cf.fetchcallsigndata(session, self.csinput)
-         if len(self._results) > 0:
-             for k, v in self._results:
-                 self._view.listWidget.addItem(f'<b>{k}</b>: {v}')
+        self._view.listWidget.clear()
+        self._csinput = self._view.searchinput.text()
+        self._results = cf.fetchcallsigndata(session, self._csinput)
+        if len(self._results) > 0:
+            for k, v in self._results.items():
+                item = f'{k}: {v}'
+                self._view.listWidget.addItem(item)
+        else:
+            self._view.listWidget.addItem('No result found!');
 
     def displaysession(self, sessionid):
         self._view.statusbar.showMessage(f'Session ID: {sessionid}', 0)
