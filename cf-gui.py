@@ -21,19 +21,24 @@ class CfGuiControl:
         self._csinput = None
 
     def _connectSignals(self):
-        #self._view.clearbutton.clicked.connect(self._view.clearOutputText)
         self._view.searchbutton.clicked.connect(self.getcsinput)
+        self._view.actionAbout.triggered.connect(lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl('https://github.com/rouyng/callsign-fetch')))
+        self._view.actionExit.triggered.connect(lambda: sys.exit())
 
     def getcsinput(self):
         self._view.listWidget.clear()
         self._csinput = self._view.searchinput.text()
-        self._results = cf.fetchcallsigndata(session, self._csinput)
-        if len(self._results) > 0:
-            for k, v in self._results.items():
-                item = f'{k}: {v}'
-                self._view.listWidget.addItem(item)
+        if cf.validatecallsign(self._csinput) == False:
+            self._results = cf.fetchcallsigndata(session, self._csinput)
+            if len(self._results) > 0:
+                for k, v in self._results.items():
+                    item = f'{k.title()}: {v}'
+                    self._view.listWidget.addItem(item)
+            else:
+                self._view.listWidget.addItem('No result found!')
         else:
-            self._view.listWidget.addItem('No result found!');
+            self._view.listWidget.addItem(cf.validatecallsign(self._csinput))
+            self._view.searchinput.clear()
 
     def displaysession(self, sessionid):
         self._view.statusbar.showMessage(f'Session ID: {sessionid}', 0)
@@ -41,10 +46,16 @@ class CfGuiControl:
 
 if __name__ == '__main__':
     configfile = 'cf.conf'
-    session = cf.initialize(configfile)
     app = QtWidgets.QApplication([])
     application = cfMainWindow()
     application.show()
     controller = CfGuiControl(view=application.ui)
-    controller.displaysession(session)
+    session = cf.initialize(configfile)
+    if not session:
+        print(f'Could not find configuration file, please check that {configfile} exists')
+        sys.exit()
+    else:
+        controller.displaysession(session)
     sys.exit(app.exec_())
+
+

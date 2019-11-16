@@ -10,6 +10,7 @@ import string
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from datetime import timedelta
+from os.path import isfile
 
 
 ## BEGIN FUNCTION DEFINITIONS
@@ -35,7 +36,7 @@ def getsession(username, password):
         return sessionID
 
 
-def validatecallsing(cs):
+def validatecallsign(cs):
     # This function accepts input of callsign to be looked up and checks it against callsign conventions
     # returns True if it appears to be valid, otherwise it prints an error message and returns False
     cs_err = ''  # this string stores any callsign validation error
@@ -50,9 +51,9 @@ def validatecallsing(cs):
         elif not any(d in cs for d in string.digits) or not any(l in cs for l in string.ascii_letters):
             cs_err = f'{cs} does not appear to be a valid callsign format (callsigns must contain both letters and digits)'
         else:
-            return True
-    print(cs_err)
-    return False
+            return False
+    return cs_err
+
 
 # This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
 def fetchcallsigndata(session_id, callsign):
@@ -71,11 +72,50 @@ def fetchcallsigndata(session_id, callsign):
             csdict[tag.split('}')[1]] = child.text
     return csdict
 
-
 # This function prints selected fields from the dict returned by fetchcallsign data, along with human-friendly labels
-def print_callsign_info(callsign_dictionary, print_these_fields=['adr_name']):
-    # field_labels dict contains the human-friendly labels for each field the API may return
-    field_labels = {'callsign': 'Callsign',
+def print_callsign_info(callsign_dictionary, lables, print_these_fields=['adr_name']):
+    for key in print_these_fields:
+        if key in lables.keys() & callsign_dictionary.keys():
+            print('{}: {}'.format(lables[key], callsign_dictionary[key]))
+
+
+def get_fields_to_print(configfile):
+    config = configparser.ConfigParser()
+    config.read(configfile)
+    field_list = []
+    fields = config.options('Fields')
+    for f in fields:
+        field_list.append(f)
+    return field_list
+
+
+def initialize(configfile):
+    # Reads credentials from config file and establishes a new/existing session
+    if isfile(configfile):
+        config = configparser.ConfigParser()
+        config.read(configfile)  # read configuration file cf.conf
+        username = config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
+        password = config.get('Credentials', 'Password')  # HamQTH password is read from cf.conf
+    else:
+        return False    # if there is no file with the path configfile, end initialization and return False
+
+    try:
+        with open('session.json') as f:
+            existing_session = json.load(f)
+            expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
+            sid = existing_session['SID']  # Existing session ID read from session.json
+            if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
+                sid = getsession(username, password)
+            else:
+                print('Existing session found\nSession ID: {}'.format(sid))
+    except FileNotFoundError:
+        sid = getsession(username, password)
+    return sid
+
+# END FUNCTION DEFINITIONS
+
+# field_labels dict contains the human-friendly labels for each field the API may return
+field_labels = {'callsign': 'Callsign',
                     'nick': 'Nickname',
                     'qth': 'QTH',
                     'country': 'Country',
@@ -122,59 +162,27 @@ def print_callsign_info(callsign_dictionary, print_these_fields=['adr_name']):
                     'flicker': 'Flickr URL',
                     'vimeo': 'Vimeo URL'
                     }
-    for key in print_these_fields:
-        if key in field_labels.keys() & callsign_dictionary.keys():
-            print('{}: {}'.format(field_labels[key], callsign_dictionary[key]))
 
-
-def get_fields_to_print(configfile):
-    config = configparser.ConfigParser()
-    config.read(configfile)
-    field_list = []
-    fields = config.options('Fields')
-    for f in fields:
-        field_list.append(f)
-    return field_list
-
-
-def initialize(configfile):
-    # Reads credentials from config file and establishes a new/existing session
-    config = configparser.ConfigParser()
-    config.read(configfile)  # read configuration file cf.conf
-    username = config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
-    password = config.get('Credentials', 'Password')  # HamQTH password is read from cf.conf
-
-    try:
-        with open('session.json') as f:
-            existing_session = json.load(f)
-            expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
-            sid = existing_session['SID']  # Existing session ID read from session.json
-            if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
-                sid = getsession(username, password)
-            else:
-                print('Existing session found\nSession ID: {}'.format(sid))
-    except FileNotFoundError:
-        sid = getsession(username, password)
-    return sid
-
-## END FUNCTION DEFINITIONS
-
-## MAIN SEQUENCE BEGIN
+# MAIN SEQUENCE BEGIN
 
 if __name__ == "__main__":
     configfile = 'cf.conf'
     session = initialize(configfile)
+    if not session:
+        print('cf.conf not found, exiting.')
+        sys.exit()
     callsign = ''
     while True:
         while True:
             user_input = input('Enter Callsign to Lookup: ')
-            if validatecallsing(user_input) == True:
+            if not validatecallsign(user_input):
                 callsign = user_input
                 break
             else:
+                print(validatecallsign(user_input))
                 continue
         callsign_results = fetchcallsigndata(session, callsign)  # request info from API and return as dict
-        print_callsign_info(callsign_results, get_fields_to_print(configfile))  # Print results from API request
+        print_callsign_info(callsign_results, field_labels, get_fields_to_print(configfile))  # Print results from API request
         # Ask if we want to look up another callsign
         again = input("Do you want to lookup another callsign? (y/n) ").lower()
         if again == 'y':
