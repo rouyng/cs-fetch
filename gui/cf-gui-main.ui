@@ -20,11 +20,20 @@
       <property name="text">
        <string>Search</string>
       </property>
+      <property name="autoDefault">
+       <bool>true</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
     <item row="0" column="0">
      <widget class="QLineEdit" name="searchinput">
       <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
        <string>Enter callsign here...</string>
       </property>
      </widget>
