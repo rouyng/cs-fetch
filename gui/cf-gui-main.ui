@@ -15,6 +15,40 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLineEdit" name="searchinput">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>Enter callsign here...</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QTableWidget" name="resultsTable">
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="columnCount">
+       <number>2</number>
+      </property>
+      <attribute name="horizontalHeaderVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>200</number>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <column/>
+      <column/>
+     </widget>
+    </item>
     <item row="0" column="1">
      <widget class="QPushButton" name="searchbutton">
       <property name="text">
@@ -27,19 +61,6 @@
        <bool>false</bool>
       </property>
      </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLineEdit" name="searchinput">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string>Enter callsign here...</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="2">
-     <widget class="QListWidget" name="listWidget"/>
     </item>
    </layout>
   </widget>
