@@ -52,7 +52,10 @@ class CfGuiControl:
             label_item = QtWidgets.QTableWidgetItem(f'{k}')
             label_item.setFont(self._labelfont)
             self._view.resultsTable.setItem(i, 0, label_item)
-            self._view.resultsTable.setItem(i, 1, QtWidgets.QTableWidgetItem(data[k]))
+            if k == 'Callsign':
+                self._view.resultsTable.setItem(i, 1, QtWidgets.QTableWidgetItem(data[k].upper()))
+            else:
+                self._view.resultsTable.setItem(i, 1, QtWidgets.QTableWidgetItem(data[k]))
 
     def displaysession(self, sessionid):
         self._view.statusbar.showMessage(f'Session ID: {sessionid}', 0)
