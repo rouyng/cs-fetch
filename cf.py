@@ -55,28 +55,29 @@ def validatecallsign(cs):
     return cs_err
 
 
-# This function requests information from the HamQTH API given a valid session ID and callsign, returns info in a dict
 def fetchcallsigndata(session_id, callsign):
-    callsignreq = requests.get(
-        'https://www.hamqth.com/xml.php?id={}&callsign={}&prg=callsignfetch'.format(session_id, callsign))
+    # This function requests information from the HamQTH API given a valid session ID and callsign
+    # If the API returns an error (including if the callsign is not found), this function returns the error message str
+    # If the callsign's info is found on HamQTH, the function returns info in a dict
+    callsignreq = requests.get(f'https://www.hamqth.com/xml.php?id={session_id}&callsign={callsign}&prg=cs-fetch')
     callsignreq.raise_for_status()  # check whether HTTP request was successful
     csroot = ET.fromstring(callsignreq.content)
-    qtherror = csroot.find('*/{https://www.hamqth.com}error')
-    if qtherror:
-        print('HamQTH Error: {}'.format(qtherror.text))
-        return False
+    if 'error' in csroot[0][0].tag:
+        qtherror = csroot[0][0].text
+        return qtherror
     else:
         csdict = {}
         for child in csroot[0]:
             tag = child.tag
             csdict[tag.split('}')[1]] = child.text
-    return csdict
+        return csdict
 
-# This function prints selected fields from the dict returned by fetchcallsign data, along with human-friendly labels
-def print_callsign_info(callsign_dictionary, lables, print_these_fields=['adr_name']):
+
+def print_callsign_info(callsign_dictionary, labels, print_these_fields=('adr_name')):
+    # This function prints selected fields from the dict returned by fetchcallsign(), along with human-friendly labels
     for key in print_these_fields:
-        if key in lables.keys() & callsign_dictionary.keys():
-            print('{}: {}'.format(lables[key], callsign_dictionary[key]))
+        if key in labels.keys() & callsign_dictionary.keys():
+            print('{}: {}'.format(labels[key], callsign_dictionary[key]))
 
 
 def get_fields_to_print(configfile):
@@ -181,8 +182,15 @@ if __name__ == "__main__":
             else:
                 print(validatecallsign(user_input))
                 continue
-        callsign_results = fetchcallsigndata(session, callsign)  # request info from API and return as dict
-        print_callsign_info(callsign_results, field_labels, get_fields_to_print(configfile))  # Print results from API request
+        callsign_result = fetchcallsigndata(session, callsign)  # request info from API and return as dict
+        if callsign_result.__class__ != dict:
+            print(f'Error: {callsign_result}')  # Errors returned by API should be a string, real results are a dict
+            if 'Session does not exist or expired' in callsign_result:
+                # re-initialize session if expired
+                print('Attempting to start a new session...')
+                session = initialize(configfile)
+        else:
+            print_callsign_info(callsign_result, field_labels, get_fields_to_print(configfile))  # Print results from API request
         # Ask if we want to look up another callsign
         again = input("Do you want to lookup another callsign? (y/n) ").lower()
         if again == 'y':
