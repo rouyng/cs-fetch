@@ -7,13 +7,13 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(435, 450)
+        MainWindow.resize(440, 455)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -22,24 +22,28 @@ class Ui_MainWindow(object):
         self.searchinput.setText("")
         self.searchinput.setObjectName("searchinput")
         self.gridLayout.addWidget(self.searchinput, 0, 0, 1, 1)
-        self.resultsTable = QtWidgets.QTableWidget(self.centralwidget)
-        self.resultsTable.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
-        self.resultsTable.setAlternatingRowColors(True)
-        self.resultsTable.setColumnCount(2)
-        self.resultsTable.setObjectName("resultsTable")
-        self.resultsTable.setRowCount(0)
-        self.resultsTable.horizontalHeader().setVisible(True)
-        self.resultsTable.horizontalHeader().setDefaultSectionSize(200)
-        self.resultsTable.verticalHeader().setVisible(False)
-        self.gridLayout.addWidget(self.resultsTable, 1, 0, 1, 2)
         self.searchbutton = QtWidgets.QPushButton(self.centralwidget)
         self.searchbutton.setAutoDefault(True)
         self.searchbutton.setDefault(False)
         self.searchbutton.setObjectName("searchbutton")
-        self.gridLayout.addWidget(self.searchbutton, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.searchbutton, 1, 0, 1, 1)
+        self.resultsTable = QtWidgets.QTableWidget(self.centralwidget)
+        self.resultsTable.setEnabled(True)
+        self.resultsTable.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.resultsTable.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
+        self.resultsTable.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.resultsTable.setProperty("showDropIndicator", False)
+        self.resultsTable.setAlternatingRowColors(True)
+        self.resultsTable.setColumnCount(2)
+        self.resultsTable.setObjectName("resultsTable")
+        self.resultsTable.setRowCount(0)
+        self.resultsTable.horizontalHeader().setVisible(False)
+        self.resultsTable.horizontalHeader().setDefaultSectionSize(208)
+        self.resultsTable.verticalHeader().setVisible(False)
+        self.gridLayout.addWidget(self.resultsTable, 2, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 435, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 440, 21))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -67,7 +71,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Cs-Fetch"))
         self.searchinput.setPlaceholderText(_translate("MainWindow", "Enter callsign here..."))
         self.searchbutton.setText(_translate("MainWindow", "Search"))
         self.menuFile.setTitle(_translate("MainWindow", "Menu"))
