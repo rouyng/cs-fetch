@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>About Cs-Fetch</string>
   </property>
+  <property name="whatsThis">
+   <string/>
+  </property>
   <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
