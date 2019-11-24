@@ -14,8 +14,9 @@ Features include:
 - simple validation of input based on length
 
 You can read more about the HamQTH API here: https://www.hamqth.com/developers.php
-
-This is a basic Python script primarily written as a practice exercise, suggestions and constructive critique are welcome.
+<a href="https://www.hamqth.com">
+    <img src="https://www.hamqth.com/images/hamqth_460x60.png" border="1" height="60" width="460" alt="HamQTH.com - Free hamradio callbook">
+</a> 
 
 ## Use
 Tested with Python 3.7.0
@@ -41,9 +42,9 @@ out lines under `[Fields]` in `cf.conf`. The order in which fields are printed c
 - `requirements.txt`: python requirements file
 
 ## TODO
-- Need to automatically request a new session if the current session expires while the script is running.
-- More sophisticated input validation based on all possible valid callsign formats
-- Refactor some functions to separate out web requests and output to user?
+- complete GUI version, currently in progress
+- windows/linux/mac packaging
 
 ## License
 This project is released under the terms of the GNU GPL v3.0. See LICENSE file for details.
+

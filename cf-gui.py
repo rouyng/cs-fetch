@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import cf
 from gui.cfguimain import Ui_MainWindow
 from gui.cfoptions import Ui_OptionsWindow
+from gui.cfabout import Ui_aboutDialog
 
 
 class cfMainWindow(QtWidgets.QMainWindow):
@@ -15,11 +16,29 @@ class cfMainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
 
 
-class cfOptionsWindow(QtWidgets.QMainWindow):
+class cfOptionsWindow(QtWidgets.QWidget):
     def __init__(self):
         super(cfOptionsWindow, self).__init__()
         self.ui = Ui_OptionsWindow()
         self.ui.setupUi(self)
+
+
+class cfAboutWindow(QtWidgets.QDialog):
+    def __init__(self):
+        super(cfAboutWindow, self).__init__()
+        self.ui = Ui_aboutDialog()
+        self.ui.setupUi(self)
+
+
+class AboutGuiControl:
+    """Cs-Fetch about window gui controller class"""
+    def __init__(self, widget, view):
+        self._view = view
+        self._widget = widget
+        self._connect_signals()
+
+    def _connect_signals(self):
+        self._view.okButton.clicked.connect(self._widget.close)
 
 
 class OptionsGuiControl:
@@ -51,10 +70,11 @@ class OptionsGuiControl:
 
 class CfGuiControl:
     """Cs-Fetch main window GUI controller class"""
-    def __init__(self, view, options_view, configuration_file):
+    def __init__(self, view, options_view, about_view, configuration_file):
         self._view = view
         self._configfile = configuration_file
         self._options_view = options_view
+        self._about_view = about_view
         self._results = {}
         self._labelfont = QtGui.QFont()
         self._labelfont.setBold(True)
@@ -78,9 +98,9 @@ class CfGuiControl:
 
     def _connect_signals(self):
         self._view.searchbutton.clicked.connect(self._process_callsign_input)
-        self._view.actionAbout.triggered.connect(lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl('https://github.com/rouyng/callsign-fetch')))
         self._view.actionExit.triggered.connect(lambda: sys.exit())
         self._view.actionOptions.triggered.connect(lambda: self._options_view.show())
+        self._view.actionAbout.triggered.connect(lambda: self._about_view.show())
         self._view.searchinput.returnPressed.connect(self._view.searchbutton.click)
 
     def _process_callsign_input(self):
@@ -145,11 +165,14 @@ class CfGuiControl:
 if __name__ == '__main__':
     configfile = 'cf.conf'
     app = QtWidgets.QApplication([])
+    app.setAttribute(QtCore.Qt.AA_DisableWindowContextHelpButton, True)  # remove ? from title bars
     app_main = cfMainWindow()
     app_options = cfOptionsWindow()
+    app_about = cfAboutWindow()
     app_main.show()
-    main_controller = CfGuiControl(view=app_main.ui, options_view=app_options, configuration_file=configfile)
+    main_controller = CfGuiControl(view=app_main.ui, options_view=app_options, about_view=app_about, configuration_file=configfile)
     options_controller = OptionsGuiControl(widget=app_options, view=app_options.ui, configuration_file=configfile)
+    about_controller = AboutGuiControl(widget=app_about, view=app_about.ui)
     sys.exit(app.exec_())
 
 
