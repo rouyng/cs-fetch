@@ -44,6 +44,7 @@ out lines under `[Fields]` in `cf.conf`. The order in which fields are printed c
 ## TODO
 - complete GUI version, currently in progress
 - windows/linux/mac packaging
+- support fetching from FCC and QRZ databases
 
 ## License
 This project is released under the terms of the GNU GPL v3.0. See LICENSE file for details.
