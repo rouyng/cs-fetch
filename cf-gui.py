@@ -88,12 +88,8 @@ class CfGuiControl:
         self._initialize_session()
 
     def _initialize_session(self):
-        self._session = cf.initialize(self._configfile)
-        if not self._session:
-            print(f'Could not find configuration file, please check that {self._configfile} exists')
-            sys.exit()
-        else:
-            self._show_session_status(self._session)
+        self._session = cf.FetchSession(self._configfile)
+        self._show_session_status(self._session.session_id)
 
 
     def _connect_signals(self):
@@ -109,28 +105,28 @@ class CfGuiControl:
         self._view.resultsTable.setRowCount(0)
         self._csinput = self._view.searchinput.text()
         self._result_data = {}
-        if not cf.validatecallsign(self._csinput):
-            # if user's input passes validation, cf.validatecallsign returns False, and we can query the API
+        if not cf.validate_callsign(self._csinput):
+            # if user's input passes validation, cf.validate_callsign returns False, and we can query the API
             start = timer()  # start timing api fetch
             self._show_progress_status(self._csinput)
-            self._results = cf.fetchcallsigndata(self._session, self._csinput)
+            self._results = cf.fetch_callsign_data(self._session.session_id, self._csinput)
             end = timer()  # end timing api fetch
             if self._results.__class__ == str:
-                # if the results of cf.fetchcallsigndata() are a string, the API has produced an error
+                # if the results of cf.fetch_callsign_data() are a string, the API has produced an error
                 self._view.resultsTable.setColumnCount(0)
                 self._view.resultsTable.setRowCount(0)
                 self._show_error_status(self._results)
                 if 'Session does not exist or expired' in self._results:
-                    cf.initialize(self._configfile)
+                    self._session = cf.FetchSession(self._configfile)
             else:
-                for key in cf.get_fields_to_print(self._configfile):
-                    if key in self._results.keys() & cf.field_labels.keys():
-                        self._result_data[cf.field_labels[key]] = self._results[key]
+                for key in self._session.field_list:
+                    if key in self._results.keys() & self._session.field_labels.keys():
+                        self._result_data[self._session.field_labels[key]] = self._results[key]
                 self._fill_results_table(self._result_data)
                 self._view.resultsTable.resizeColumnsToContents()
                 self._show_timer_status(end - start)
         else:
-            self._view.statusbar.showMessage(cf.validatecallsign(self._csinput))
+            self._view.statusbar.showMessage(cf.validate_callsign(self._csinput))
             self._view.searchinput.clear()
 
     def _fill_results_table(self, data):
@@ -149,7 +145,7 @@ class CfGuiControl:
         self._view.statusbar.showMessage(f'Session ID: {sessionid}', 0)
 
     def _show_error_status(self, error_text):
-        self._view.statusbar.showMessage(f'Error: {error_text}', 0) # show error in status bar for 5 sec
+        self._view.statusbar.showMessage(f'Error: {error_text}', 0)  # show error in status bar
 
     def _show_timer_status(self, time):
         self._view.statusbar.showMessage(f'Retrieved callsign info in {time: .2f} seconds', 0)
