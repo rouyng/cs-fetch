@@ -3,14 +3,15 @@
 # You must have a HamQTH account as the API requires a valid username and password to start a session
 
 import configparser
-import sys
 import json
-import requests
 import string
+import sys
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from datetime import timedelta
 from os.path import isfile
+
+import requests
 
 
 # BEGIN FetchSession Class
@@ -37,7 +38,7 @@ class FetchSession:
                              'adr_street2': 'Address 2',
                              'adr_street3': 'Address 3',
                              'adr_city': 'City',
-                             'adr_zip': 'Zip code',
+                             'adr_zip': 'Zip/postal code',
                              'adr_country': 'Country (from address)',
                              'adr_adif': 'ADIF (from address)',
                              'district': 'District',

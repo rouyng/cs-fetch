@@ -14,6 +14,12 @@ class Ui_aboutDialog(object):
     def setupUi(self, aboutDialog):
         aboutDialog.setObjectName("aboutDialog")
         aboutDialog.resize(400, 169)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(aboutDialog.sizePolicy().hasHeightForWidth())
+        aboutDialog.setSizePolicy(sizePolicy)
+        aboutDialog.setWhatsThis("")
         self.okButton = QtWidgets.QPushButton(aboutDialog)
         self.okButton.setGeometry(QtCore.QRect(160, 130, 75, 23))
         self.okButton.setObjectName("okButton")

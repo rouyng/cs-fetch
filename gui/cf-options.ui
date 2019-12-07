@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>422</width>
     <height>303</height>
    </rect>
   </property>
@@ -22,7 +22,7 @@
      <x>10</x>
      <y>10</y>
      <width>211</width>
-     <height>111</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -86,10 +86,10 @@
    <widget class="QLabel" name="qthlink">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>80</y>
-      <width>171</width>
-      <height>21</height>
+      <width>191</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -98,7 +98,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Create an account at &lt;a href=&quot;https://www.hamqth.com/register.php&quot;&gt;HamQTH.com&lt;/a&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Required for using HamQTH database&lt;br/&gt;Create an account at &lt;a href=&quot;https://www.hamqth.com/register.php&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;HamQTH.com&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="textFormat">
      <enum>Qt::RichText</enum>
@@ -117,7 +117,7 @@
   <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>240</x>
      <y>270</y>
      <width>75</width>
      <height>23</height>
@@ -130,7 +130,7 @@
   <widget class="QPushButton" name="cancelButton">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>330</x>
      <y>270</y>
      <width>75</width>
      <height>23</height>
@@ -143,9 +143,9 @@
   <widget class="QScrollArea" name="scrollArea">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>230</x>
      <y>20</y>
-     <width>151</width>
+     <width>181</width>
      <height>241</height>
     </rect>
    </property>
@@ -162,8 +162,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>0</y>
-      <width>130</width>
+      <y>-240</y>
+      <width>160</width>
       <height>1072</height>
      </rect>
     </property>
@@ -174,324 +174,324 @@
         <enum>QLayout::SetFixedSize</enum>
        </property>
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="callsignBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Callsign</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_3">
+        <widget class="QCheckBox" name="nickBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Nickname</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_4">
+        <widget class="QCheckBox" name="qthBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>QTH</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_5">
+        <widget class="QCheckBox" name="countryBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Country</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="adifBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>ADIF ID</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_6">
+        <widget class="QCheckBox" name="ituBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>ITU</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_7">
+        <widget class="QCheckBox" name="cqBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>CQ (WAZ) zone</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_8">
+        <widget class="QCheckBox" name="gridBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Grid Square</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_9">
+        <widget class="QCheckBox" name="adrnameBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Name (from address)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_37">
+        <widget class="QCheckBox" name="addr1Box">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Address 1</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_18">
+        <widget class="QCheckBox" name="adr2Box">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Address 2</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_39">
+        <widget class="QCheckBox" name="addr3Box">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Address 3</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_20">
+        <widget class="QCheckBox" name="cityBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>City</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_16">
+        <widget class="QCheckBox" name="zipBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Zip/Postal code</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_28">
+        <widget class="QCheckBox" name="countryBox_2">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Country (from address)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_38">
+        <widget class="QCheckBox" name="adifaddrBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>ADIF (from address</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_45">
+        <widget class="QCheckBox" name="districtBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>District</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_13">
+        <widget class="QCheckBox" name="stateBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>State (USA)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_25">
+        <widget class="QCheckBox" name="countyBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>County (USA)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_27">
+        <widget class="QCheckBox" name="oblastBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Oblast (RUS)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_33">
+        <widget class="QCheckBox" name="dokBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>DOK</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_24">
+        <widget class="QCheckBox" name="iotaBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>IOTA#</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_43">
+        <widget class="QCheckBox" name="qslBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>QSL Info</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_40">
+        <widget class="QCheckBox" name="lotwBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Uses LOTW?</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_44">
+        <widget class="QCheckBox" name="eqslBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Uses EQSL?</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_35">
+        <widget class="QCheckBox" name="qslbBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Accept QSL via bureau?</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_19">
+        <widget class="QCheckBox" name="directqslBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Accept direct QSL card?</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_29">
+        <widget class="QCheckBox" name="emailBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Email address</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_30">
+        <widget class="QCheckBox" name="jabberBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Jabber</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_26">
+        <widget class="QCheckBox" name="icqBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>ICQ</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_15">
+        <widget class="QCheckBox" name="msnBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>MSN</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_31">
+        <widget class="QCheckBox" name="skypeBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Skype</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_46">
+        <widget class="QCheckBox" name="birthyearBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Year of Birth</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_21">
+        <widget class="QCheckBox" name="licenseyearBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Licensed since</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_36">
+        <widget class="QCheckBox" name="photoBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>URL to user's photo</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_42">
+        <widget class="QCheckBox" name="latBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Latitude</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_23">
+        <widget class="QCheckBox" name="longBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Longitude</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_41">
+        <widget class="QCheckBox" name="contBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Continent</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_17">
+        <widget class="QCheckBox" name="utcBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Offset to UTC time</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_14">
+        <widget class="QCheckBox" name="fbookBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Facebook URL</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_10">
+        <widget class="QCheckBox" name="twitBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Twitter URL</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_11">
+        <widget class="QCheckBox" name="gplusBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Google Plus URL</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_12">
+        <widget class="QCheckBox" name="utubeBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Youtube URL</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_22">
+        <widget class="QCheckBox" name="linkedBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>LinkedIn URL</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_32">
+        <widget class="QCheckBox" name="flickrBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Flickr URL</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_34">
+        <widget class="QCheckBox" name="vimeoBox">
          <property name="text">
-          <string>CheckBox</string>
+          <string>Vimeo URL</string>
          </property>
         </widget>
        </item>
@@ -499,6 +499,83 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QGroupBox" name="dbBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>211</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Database</string>
+   </property>
+   <widget class="QRadioButton" name="qthButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>91</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>HamQTH.com</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="qrzButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>QRZ.com</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="fccButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>171</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>FCC ULS (USA callsigns only)</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>0</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select fields to display</string>
+   </property>
   </widget>
  </widget>
  <resources/>
