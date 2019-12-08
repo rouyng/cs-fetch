@@ -58,8 +58,6 @@ class OptionsGuiControl:
 
     def _load_config(self):
         # load options from active session and display them in appropriate widgets
-        global active_session
-        self._session = active_session
         self._fields = [self._session.field_labels[f] for f in self._session.field_list]
         for b in self._view.scrollAreaWidgetContents.children():
             if isinstance(b, QtWidgets.QCheckBox):
@@ -83,8 +81,7 @@ class OptionsGuiControl:
                 if b.isChecked():
                     new_fields.append(b.text())
         new_fields = [k for k, i in self._session.field_labels.items() if i in new_fields]
-        global active_session
-        active_session.write_config(new_fields, self._view.userField.text(), self._view.pwField.text(), source)
+        self._session.write_config(new_fields, self._view.userField.text(), self._view.pwField.text(), source)
         self._widget.close()
         self._load_config()
 
@@ -139,9 +136,7 @@ class CfGuiControl:
                 self._view.resultsTable.setRowCount(0)
                 self._show_error_status(self._results)
                 if 'Session does not exist or expired' in self._results:
-                    global active_session  # tell the function to access the global active_session variable
-                    active_session = cf.FetchSession(self._configfile)  # create a new FetchSession instance
-                    self._session = active_session  # set class-scope session variable
+                    self._session = cf.FetchSession(self._configfile)
                     self._show_session_status(self._session.session_id)
             else:
                 for key in self._session.field_list:

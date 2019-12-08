@@ -14,9 +14,16 @@ from os.path import isfile
 import requests
 
 
+class Borg:
+    _shared_state = {}
+    def __init__(self):
+        self.__dict__ = self._shared_state
+
+
 # BEGIN FetchSession Class
-class FetchSession:
+class FetchSession(Borg):
     def __init__(self, configuration_file, data_source='hamqth'):
+        Borg.__init__(self)
         self._configfile = configuration_file  # configuration file, should be cf.conf
         self._config = configparser.ConfigParser(inline_comment_prefixes='#')
         self.username = ''  # API username
