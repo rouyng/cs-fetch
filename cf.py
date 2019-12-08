@@ -18,12 +18,12 @@ import requests
 class FetchSession:
     def __init__(self, configuration_file, data_source='hamqth'):
         self._configfile = configuration_file  # configuration file, should be cf.conf
-        self._config = configparser.ConfigParser()
+        self._config = configparser.ConfigParser(inline_comment_prefixes='#')
         self.username = ''  # API username
         self.password = ''  # API password
         self.field_list = []  # list of fields to print based on user configuration
         self.session_id = ''  # session ID supplied by remote API
-        self._source = data_source  # placeholder for switching to QRZ and FCC dbs, as well as original hamqth
+        self.source = data_source  # placeholder for switching to QRZ and FCC dbs, as well as original hamqth
         # field_labels dict contains the human-friendly labels for each field the API may return
         self.field_labels = {'callsign': 'Callsign',
                              'nick': 'Nickname',
@@ -31,7 +31,7 @@ class FetchSession:
                              'country': 'Country',
                              'adif': 'ADIF ID',
                              'itu': 'ITU',
-                             'CQ': 'CQ (WAZ) zone',
+                             'cq': 'CQ (WAZ) zone',
                              'grid': 'Grid Square',
                              'adr_name': 'Name (from address)',
                              'adr_street1': 'Address 1',
@@ -87,13 +87,16 @@ class FetchSession:
         try:
             with open('session.json') as f:
                 existing_session = json.load(f)
-                expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
-                sid = existing_session['SID']  # Existing session ID read from session.json
-                if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
-                    self.get_session_hamqth(self.username, self.password)
+                if existing_session['SID']:
+                    expire_time = existing_session['EXP']  # Existing session expiration date/time read from session.json
+                    sid = existing_session['SID']  # Existing session ID read from session.json
+                    if datetime.now() >= datetime.strptime(expire_time.split('.')[0], '%Y-%m-%d %H:%M:%S'):
+                        self.get_session_hamqth(self.username, self.password)
+                    else:
+                        print('Existing session found\nSession ID: {}'.format(sid))
+                        self.session_id = sid
                 else:
-                    print('Existing session found\nSession ID: {}'.format(sid))
-                    self.session_id = sid
+                    self.get_session_hamqth(self.username, self.password)
         except FileNotFoundError:
             self.get_session_hamqth(self.username, self.password)
 
@@ -119,9 +122,27 @@ class FetchSession:
     def _get_fields_to_print(self):
         # read config
         self.field_list = []
-        fields = self._config.options('Fields')
-        for f in fields:
-            self.field_list.append(f)
+        for f in self._config.options('Fields to print'):
+            if self._config.getboolean('Fields to print', f):
+                self.field_list.append(f)
+
+    def write_config(self, new_fields, new_username, new_password, new_source):
+        # write changed configuration to the configfile and re-initialize session
+        self._config.set('Credentials', 'user', new_username)
+        self._config.set('Credentials', 'password', new_password)
+        self._config.set('Database', 'source', new_source)
+        for f in self._config.options('Fields to print'):
+            if f in new_fields:
+                self._config.set('Fields to print', f, 'yes')
+            else:
+                self._config.set('Fields to print', f, 'no')
+        with open(self._configfile, 'w') as file:  # write the configuration file
+            self._config.write(file)
+        if (new_username, new_password, new_source) != (self.username, self.password, self.source):
+            with open('session.json', 'w') as e:  # store session_dict in JSON file
+                json.dump({'SID': None, 'EXP': None}, e)
+        self.session_initialize()
+
 
 
 # END FetchSession Class

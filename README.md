@@ -1,17 +1,21 @@
-# Callsign Info Fetcher
-A simple Python script to lookup amateur radio license information via the HamQTH.com API.
+# Cs-Fetch
+A simple Python-based program to lookup amateur radio license information via the HamQTH.com API. Includes GUI and 
+interactive command-line interfaces.
 
 By Ross, KJ7GES
 
 ## Overview
-This script interactively takes amateur (ham) radio callsigns as an input, looks them up in the HamQTH.com database, and returns several info fields if the callsign exists in the database. Designed for simple, quick operation when you don't want to use a logging program or deal with a mouse-driven web UI and just want basic information about the callsign. 
+Cs-Fetch (or Callsign-Fetch) is intended to be a simple, fast and flexible way to look up information about
+amateur (ham) radio callsigns. It is not intended to replace logging programs or web databases, just as an aid to
+radio operation and monitoring. Currently supports pulling information from the HamQTH.com database, with plans to
+allow selectable use of FCC and QRZ.com databases.
 
 Features include:
-- reading credentials from a configuration file
-- can configure which fields are returned and their order, from configuration file
-- storing and recalling an active session if the script is stopped
-- HTTP request error handling
-- simple validation of input based on length
+- Command-line and GUI-based interface
+- User-configurable results
+- API session memory and auto-renewal
+- Basic validation of callsign input
+- Cross-platform with QT-based GUI 
 
 You can read more about the HamQTH API here: https://www.hamqth.com/developers.php
 <a href="https://www.hamqth.com">
@@ -45,6 +49,7 @@ out lines under `[Fields]` in `cf.conf`. The order in which fields are printed c
 - complete GUI version, currently in progress
 - windows/linux/mac packaging
 - support fetching from FCC and QRZ databases
+- offline mode, lookup of location based on callsign prefix
 
 ## License
 This project is released under the terms of the GNU GPL v3.0. See LICENSE file for details.

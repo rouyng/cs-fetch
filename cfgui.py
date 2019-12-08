@@ -43,34 +43,60 @@ class AboutGuiControl:
 
 class OptionsGuiControl:
     """Cs-Fetch options window gui contoller class"""
-    def __init__(self, widget, view, configuration_file):
+    def __init__(self, widget, view, configuration_file, session):
         self._view = view
         self._widget = widget
+        self._session = session
         self._configfile = configuration_file
-        self._load_config(self._configfile)
+        self._fields = [self._session.field_labels[f] for f in self._session.field_list]
+        self._load_config()
         self._connect_signals()
 
     def _connect_signals(self):
-        self._view.okButton.clicked.connect(lambda: self._save_config(self._configfile))
+        self._view.okButton.clicked.connect(lambda: self._save_config())
         self._view.cancelButton.clicked.connect(lambda: self._cancel())
 
-    def _load_config(self, file):
-        # load options from cf.conf and display them in appropriate widgets
-        pass
+    def _load_config(self):
+        # load options from active session and display them in appropriate widgets
+        global active_session
+        self._session = active_session
+        self._fields = [self._session.field_labels[f] for f in self._session.field_list]
+        for b in self._view.scrollAreaWidgetContents.children():
+            if isinstance(b, QtWidgets.QCheckBox):
+                if b.text() in self._fields:
+                    b.setChecked(True)
+                else:
+                    b.setChecked(False)
+        self._view.userField.setText(self._session.username)  # set username from session
+        self._view.pwField.setText(self._session.password)  # set password from session
+        if self._session.source == 'hamqth':
+            self._view.qthButton.setChecked(True)
 
-    def _save_config(self, file):
+    def _save_config(self):
         # save options from GUI to cf.conf, hide view and reinitialize
+        new_fields = []
+        source = 'hamqth'
+        if self._view.qthButton.isChecked():
+            source = 'hamqth'
+        for b in self._view.scrollAreaWidgetContents.children():
+            if isinstance(b, QtWidgets.QCheckBox):
+                if b.isChecked():
+                    new_fields.append(b.text())
+        new_fields = [k for k, i in self._session.field_labels.items() if i in new_fields]
+        global active_session
+        active_session.write_config(new_fields, self._view.userField.text(), self._view.pwField.text(), source)
         self._widget.close()
+        self._load_config()
 
     def _cancel(self):
         # hide view and reload config from file when cancel button is pressed
         self._widget.close()
-        self._load_config(self._configfile)
+        self._load_config()
 
 
 class CfGuiControl:
     """Cs-Fetch main window GUI controller class"""
-    def __init__(self, view, options_view, about_view, configuration_file):
+    def __init__(self, view, options_view, about_view, configuration_file, session):
         self._view = view
         self._configfile = configuration_file
         self._options_view = options_view
@@ -81,14 +107,10 @@ class CfGuiControl:
         self._connect_signals()
         self._result_data = {'Welcome to Cs-Fetch!': 'Enter a callsign and press "Search"'}
         self._csinput = None
-        self._session = None
+        self._session = session
         self._start = None
         self._end = None
         self._fill_results_table(self._result_data)
-        self._initialize_session()
-
-    def _initialize_session(self):
-        self._session = cf.FetchSession(self._configfile)
         self._show_session_status(self._session.session_id)
 
 
@@ -117,7 +139,10 @@ class CfGuiControl:
                 self._view.resultsTable.setRowCount(0)
                 self._show_error_status(self._results)
                 if 'Session does not exist or expired' in self._results:
-                    self._session = cf.FetchSession(self._configfile)
+                    global active_session  # tell the function to access the global active_session variable
+                    active_session = cf.FetchSession(self._configfile)  # create a new FetchSession instance
+                    self._session = active_session  # set class-scope session variable
+                    self._show_session_status(self._session.session_id)
             else:
                 for key in self._session.field_list:
                     if key in self._results.keys() & self._session.field_labels.keys():
@@ -154,20 +179,21 @@ class CfGuiControl:
         self._view.statusbar.showMessage(f'Retrieving information about {entered_callsign}', 0)
 
 # TODO: additional widget for adjusting options within GUI
-# TODO: additional widget for "About" menu item
+# TODO: gui error message for wrong username/pw
 # TODO: copy results to clipboard button
 # TODO: icons for window and task bar
 
 if __name__ == '__main__':
     configfile = 'cf.conf'
+    active_session = cf.FetchSession(configfile)
     app = QtWidgets.QApplication([])
     app.setAttribute(QtCore.Qt.AA_DisableWindowContextHelpButton, True)  # remove ? from title bars
     app_main = cfMainWindow()
     app_options = cfOptionsWindow()
     app_about = cfAboutWindow()
     app_main.show()
-    main_controller = CfGuiControl(view=app_main.ui, options_view=app_options, about_view=app_about, configuration_file=configfile)
-    options_controller = OptionsGuiControl(widget=app_options, view=app_options.ui, configuration_file=configfile)
+    main_controller = CfGuiControl(view=app_main.ui, options_view=app_options, about_view=app_about, configuration_file=configfile, session=active_session)
+    options_controller = OptionsGuiControl(widget=app_options, view=app_options.ui, configuration_file=configfile, session=active_session)
     about_controller = AboutGuiControl(widget=app_about, view=app_about.ui)
     sys.exit(app.exec_())
 
