@@ -1,15 +1,15 @@
-# Cs-Fetch
+# cs-fetch
 A simple program to lookup amateur radio call sign information via the HamQTH.com API. Includes GUI and 
 interactive command-line interfaces.
 
 By Ross, KJ7GES
 
 ## Overview
-Cs-Fetch (or Callsign-Fetch) is intended to be a simple, fast and flexible way to look up information about
+cs-fetch (or callsign-fetch) is intended to be a simple, fast and flexible way to look up information about
 amateur (ham) radio call signs. It is not intended to replace logging programs or web databases, just as an aid to
 radio operation and monitoring. Currently supports fetching information from the HamQTH.com database, with plans to
-allow selectable use of FCC and QRZ.com databases. Cs-Fetch is written in Python and uses PyQt5 for the GUI interface. 
-Bug reports and code contributions are welcome.
+allow selectable use of FCC and QRZ.com databases. cs-fetch is written in Python and uses PyQt5 for the GUI interface. 
+Bug/issue reports and code contributions are welcome.
 
 Features include:
 - Interactive command line and GUI interfaces
@@ -24,7 +24,7 @@ You can read more about the HamQTH API here: https://www.hamqth.com/developers.p
 </a> 
 
 ## Installation
-Cs-Fetch was written and tested with Python 3.7.0, so you should have this version or a newer installed.
+cs-fetch was written and tested with Python 3.7.0, so you should have this version or a newer installed.
 It may work with earlier versions of Python, but I have not tested this.
 
 Download/clone the repository into your directory of choice. To install all required python packages, run this 
@@ -52,8 +52,8 @@ python cf.py
 ```
 
 ## Important Files
-- `cf.py`: Cs-Fetch command line version
-- `cfgui.py` Cs-Fetch GUI version
+- `cf.py`: cs-fetch command line version
+- `cfgui.py` cs-fetch GUI version
 - `cf.conf`: This is the configuration file for the script, enter your HamQTH.com credentials here before use.
 - `/gui`: Contains required files for the PyQt5 GUI
 - `requirements.txt`: python requirements file
