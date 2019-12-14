@@ -21,6 +21,7 @@ class FetchSession():
         self._config = configparser.ConfigParser(inline_comment_prefixes='#')
         self.username = ''  # API username
         self.password = ''  # API password
+        self.session_error = False
         self.field_list = []  # list of fields to print based on user configuration
         self.session_id = ''  # session ID supplied by remote API
         self.source = data_source  # placeholder for switching to QRZ and FCC dbs, as well as original hamqth
@@ -77,13 +78,13 @@ class FetchSession():
 
     def session_initialize(self):
         # Reads credentials from config file and establishes a new/existing session
+        self.session_error = False
         if isfile(self._configfile):
             self._config.read(self._configfile)  # read configuration file cf.conf
             self.username = self._config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
             self.password = self._config.get('Credentials', 'Password')  # User's password is read from cf.conf
         else:
             raise FileNotFoundError(f'The specified configuration file {self._configfile} was not found')
-
         try:
             with open('session.json') as f:
                 existing_session = json.load(f)
@@ -101,23 +102,25 @@ class FetchSession():
             self.get_session_hamqth(self.username, self.password)
 
     def get_session_hamqth(self, username, password):
-        session_req = requests.get(f'https://www.hamqth.com/xml.php?u={username}&p={password}')
-        session_req.raise_for_status()  # check whether HTTP request was successful
-        # need to handle exception for timeouts/network errors etc here, add retry loop
-        root = ET.fromstring(session_req.content)  # get XML tree from HTTPS request results
-        session_id = root[0][0].text
-        if session_id == 'Wrong user name or password':
-            print("Wrong user name or password! Please enter valid HamQTH.com credentials in cf.conf")
-            sys.exit(1)  # exit if credentials are wrong
-        else:
-            expire_time = datetime.now() + timedelta(hours=1)
-            session_dict = {'SID': str(session_id), 'EXP': str(expire_time)}
-            with open('session.json', 'w') as e:  # store session_dict in JSON file
-                json.dump(session_dict, e)
-            exp_formatted = expire_time.strftime('%H:%M:%S')
-            print(
-                f'Connected to HamQTH.com as {username}\nSession ID: {session_id}\nExpires {exp_formatted}')
-            self.session_id = session_id
+        print(f'Starting new {self.source} session as {self.username}...')
+        try:
+            session_req = requests.get(f'https://www.hamqth.com/xml.php?u={username}&p={password}')
+            session_req.raise_for_status()  # check whether HTTP request was successful
+            root = ET.fromstring(session_req.content)  # get XML tree from HTTPS request results
+            session_id = root[0][0].text
+            if session_id == 'Wrong user name or password':
+                raise ConnectionError("Wrong user name or password! Please enter valid HamQTH credentials in cf.conf")
+            else:
+                expire_time = datetime.now() + timedelta(hours=1)
+                session_dict = {'SID': str(session_id), 'EXP': str(expire_time)}
+                with open('session.json', 'w') as e:  # store session_dict in JSON file
+                    json.dump(session_dict, e)
+                exp_formatted = expire_time.strftime('%H:%M:%S')
+                print(
+                    f'Connected to HamQTH.com as {username}\nSession ID: {session_id}\nExpires {exp_formatted}')
+                self.session_id = session_id
+        except (requests.exceptions.ConnectionError, ConnectionError) as se:
+            self.session_error = se
 
     def _get_fields_to_print(self):
         # read config
@@ -174,18 +177,21 @@ def fetch_callsign_data(session_id, callsign):
     # This function requests information from the HamQTH API given a valid session ID and callsign
     # If the API returns an error (including if the callsign is not found), this function returns the error message str
     # If the callsign's info is found on HamQTH, the function returns info in a dict
-    callsignreq = requests.get(f'https://www.hamqth.com/xml.php?id={session_id}&callsign={callsign}&prg=cs-fetch')
-    callsignreq.raise_for_status()  # check whether HTTP request was successful
-    csroot = ET.fromstring(callsignreq.content)
-    if 'error' in csroot[0][0].tag:
-        qtherror = csroot[0][0].text
-        return qtherror
-    else:
-        csdict = {}
-        for child in csroot[0]:
-            tag = child.tag
-            csdict[tag.split('}')[1]] = child.text
-        return csdict
+    try:
+        callsignreq = requests.get(f'https://www.hamqth.com/xml.php?id={session_id}&callsign={callsign}&prg=cs-fetch')
+        callsignreq.raise_for_status()  # check whether HTTP request was successful
+        csroot = ET.fromstring(callsignreq.content)
+        if 'error' in csroot[0][0].tag:
+            qtherror = csroot[0][0].text
+            return qtherror
+        else:
+            csdict = {}
+            for child in csroot[0]:
+                tag = child.tag
+                csdict[tag.split('}')[1]] = child.text
+            return csdict
+    except requests.exceptions.ConnectionError as fe:
+        return 'Connection error, please check your internet connection'
 
 
 def print_callsign_info(callsign_dictionary, labels, print_these_fields=('adr_name')):
@@ -203,6 +209,10 @@ def print_callsign_info(callsign_dictionary, labels, print_these_fields=('adr_na
 if __name__ == "__main__":
     configfile = 'cf.conf'
     session = FetchSession(configfile)
+    if session.session_error:
+        print(f'Unable to connect to server, please check your internet connection')
+        print(session.session_error)
+        sys.exit(1)
     callsign = ''
     while True:
         while True:

@@ -4,9 +4,9 @@ from timeit import default_timer as timer
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 import cf
+from gui.cfabout import Ui_aboutDialog
 from gui.cfguimain import Ui_MainWindow
 from gui.cfoptions import Ui_OptionsWindow
-from gui.cfabout import Ui_aboutDialog
 
 
 class cfMainWindow(QtWidgets.QMainWindow):
@@ -107,8 +107,12 @@ class CfGuiControl:
         self._session = session
         self._start = None
         self._end = None
+        self._status_widget = None
         self._fill_results_table(self._result_data)
-        self._show_session_status(self._session.session_id)
+        if self._session.session_error:
+            self._show_error_status('Connection error, please check your internet connection')
+        else:
+            self._show_session_status(self._session.session_id)
 
 
     def _connect_signals(self):
@@ -124,14 +128,15 @@ class CfGuiControl:
         self._view.resultsTable.setRowCount(0)
         self._csinput = self._view.searchinput.text()
         self._result_data = {}
-        if not cf.validate_callsign(self._csinput):
+        validation_failed = cf.validate_callsign(self._csinput)
+        if not validation_failed:
             # if user's input passes validation, cf.validate_callsign returns False, and we can query the API
             start = timer()  # start timing api fetch
             self._show_progress_status(self._csinput)
             self._results = cf.fetch_callsign_data(self._session.session_id, self._csinput)
             end = timer()  # end timing api fetch
             if self._results.__class__ == str:
-                # if the results of cf.fetch_callsign_data() are a string, the API has produced an error
+                # if the results of cf.fetch_callsign_data() are not a dictionary, the API has produced an error
                 self._view.resultsTable.setColumnCount(0)
                 self._view.resultsTable.setRowCount(0)
                 self._show_error_status(self._results)
@@ -146,7 +151,7 @@ class CfGuiControl:
                 self._view.resultsTable.resizeColumnsToContents()
                 self._show_timer_status(end - start)
         else:
-            self._view.statusbar.showMessage(cf.validate_callsign(self._csinput))
+            self._show_error_status(validation_failed)
             self._view.searchinput.clear()
 
     def _fill_results_table(self, data):
@@ -162,16 +167,26 @@ class CfGuiControl:
                 self._view.resultsTable.setItem(i, 1, QtWidgets.QTableWidgetItem(data[k]))
 
     def _show_session_status(self, sessionid):
-        self._view.statusbar.showMessage(f'Session ID: {sessionid}', 0)
+        self._view.statusbar.removeWidget(self._status_widget)
+        self._status_widget = QtWidgets.QLabel(f'Session ID: {sessionid}')
+        self._view.statusbar.addWidget(self._status_widget)
+        self._view.statusbar.setStyleSheet("background-color: rgb(227, 227, 227);")
 
     def _show_error_status(self, error_text):
-        self._view.statusbar.showMessage(f'Error: {error_text}', 0)  # show error in status bar
+        self._view.statusbar.removeWidget(self._status_widget)
+        self._status_widget = QtWidgets.QLabel(f'Error: {error_text}')
+        self._view.statusbar.addWidget(self._status_widget)
+        self._view.statusbar.setStyleSheet("background-color: rgb(255, 153, 153);")
 
     def _show_timer_status(self, time):
         self._view.statusbar.showMessage(f'Retrieved callsign info in {time: .2f} seconds', 0)
+        self._view.statusbar.setStyleSheet("background-color: rgb(227, 227, 227);")
 
     def _show_progress_status(self, entered_callsign):
-        self._view.statusbar.showMessage(f'Retrieving information about {entered_callsign}', 0)
+        self._view.statusbar.removeWidget(self._status_widget)
+        self._status_widget = QtWidgets.QLabel(f'Retrieving information about {entered_callsign}')
+        self._view.statusbar.addWidget(self._status_widget)
+        self._view.statusbar.setStyleSheet("background-color: rgb(227, 227, 227);")
 
 # TODO: additional widget for adjusting options within GUI
 # TODO: gui error message for wrong username/pw
