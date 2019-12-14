@@ -170,7 +170,7 @@ class CfGuiControl:
         self._view.statusbar.removeWidget(self._status_widget)
         self._status_widget = QtWidgets.QLabel(f'Session ID: {sessionid}')
         self._view.statusbar.addWidget(self._status_widget)
-        self._view.statusbar.setStyleSheet("background-color: rgb(227, 227, 227);")
+        self._view.statusbar.setStyleSheet("background-color: rgb(240, 240, 240);")
 
     def _show_error_status(self, error_text):
         self._view.statusbar.removeWidget(self._status_widget)
@@ -179,14 +179,16 @@ class CfGuiControl:
         self._view.statusbar.setStyleSheet("background-color: rgb(255, 153, 153);")
 
     def _show_timer_status(self, time):
-        self._view.statusbar.showMessage(f'Retrieved callsign info in {time: .2f} seconds', 0)
-        self._view.statusbar.setStyleSheet("background-color: rgb(227, 227, 227);")
+        self._view.statusbar.removeWidget(self._status_widget)
+        self._status_widget = QtWidgets.QLabel(f'Retrieved callsign info in {time: .2f} seconds')
+        self._view.statusbar.addWidget(self._status_widget)
+        self._view.statusbar.setStyleSheet("background-color: rgb(240, 240, 240);")
 
     def _show_progress_status(self, entered_callsign):
         self._view.statusbar.removeWidget(self._status_widget)
         self._status_widget = QtWidgets.QLabel(f'Retrieving information about {entered_callsign}')
         self._view.statusbar.addWidget(self._status_widget)
-        self._view.statusbar.setStyleSheet("background-color: rgb(227, 227, 227);")
+        self._view.statusbar.setStyleSheet("background-color: rgb(240, 240, 240);")
 
 # TODO: additional widget for adjusting options within GUI
 # TODO: gui error message for wrong username/pw
