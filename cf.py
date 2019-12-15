@@ -79,12 +79,16 @@ class FetchSession():
     def session_initialize(self):
         # Reads credentials from config file and establishes a new/existing session
         self.session_error = False
-        if isfile(self._configfile):
-            self._config.read(self._configfile)  # read configuration file cf.conf
-            self.username = self._config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
-            self.password = self._config.get('Credentials', 'Password')  # User's password is read from cf.conf
-        else:
-            raise FileNotFoundError(f'The specified configuration file {self._configfile} was not found')
+        self.session_id = None
+        if self.username == '' or self.password == '':
+            # if username/password are blank, read config file
+            # otherwise, if they are not we can expect the new username/password have been set by write_config()
+            if isfile(self._configfile):
+                self._config.read(self._configfile)  # read configuration file cf.conf
+                self.username = self._config.get('Credentials', 'User')  # The user's callsign is read from cf.conf
+                self.password = self._config.get('Credentials', 'Password')  # User's password is read from cf.conf
+            else:
+                raise FileNotFoundError(f'The specified configuration file {self._configfile} was not found')
         try:
             with open('session.json') as f:
                 existing_session = json.load(f)
@@ -131,21 +135,25 @@ class FetchSession():
 
     def write_config(self, new_fields, new_username, new_password, new_source):
         # write changed configuration to the configfile and re-initialize session
-        self._config.set('Credentials', 'user', new_username)
-        self._config.set('Credentials', 'password', new_password)
-        self._config.set('Database', 'source', new_source)
         for f in self._config.options('Fields to print'):
             if f in new_fields:
                 self._config.set('Fields to print', f, 'yes')
             else:
                 self._config.set('Fields to print', f, 'no')
-        with open(self._configfile, 'w') as file:  # write the configuration file
-            self._config.write(file)
         if (new_username, new_password, new_source) != (self.username, self.password, self.source):
+            self._config.set('Credentials', 'user', new_username)
+            self._config.set('Credentials', 'password', new_password)
+            self._config.set('Database', 'source', new_source)
+            self.username = new_username
+            self.password = new_password
+            self.source = new_source
             with open('session.json', 'w') as e:  # store session_dict in JSON file
                 json.dump({'SID': None, 'EXP': None}, e)
+        with open(self._configfile, 'w') as file:  # write the configuration file
+            self._config.write(file)
         self.session_initialize()
         self._get_fields_to_print()
+
 
 
 

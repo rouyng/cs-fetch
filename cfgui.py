@@ -109,11 +109,13 @@ class CfGuiControl:
         self._end = None
         self._status_widget = None
         self._fill_results_table(self._result_data)
+        self._check_session_status()
+
+    def _check_session_status(self):
         if self._session.session_error:
-            self._show_error_status('Connection error, please check your internet connection')
+            self._show_error_status(f'{self._session.session_error.__str__()[:78]}')
         else:
             self._show_session_status(self._session.session_id)
-
 
     def _connect_signals(self):
         self._view.searchbutton.clicked.connect(self._process_callsign_input)
@@ -142,7 +144,7 @@ class CfGuiControl:
                 self._show_error_status(self._results)
                 if 'Session does not exist or expired' in self._results:
                     self._session = cf.FetchSession(self._configfile)
-                    self._show_session_status(self._session.session_id)
+                    self._check_session_status()
             else:
                 for key in self._session.field_list:
                     if key in self._results.keys() & self._session.field_labels.keys():
@@ -190,8 +192,6 @@ class CfGuiControl:
         self._view.statusbar.addWidget(self._status_widget)
         self._view.statusbar.setStyleSheet("background-color: rgb(240, 240, 240);")
 
-# TODO: additional widget for adjusting options within GUI
-# TODO: gui error message for wrong username/pw
 # TODO: copy results to clipboard button
 # TODO: icons for window and task bar
 
