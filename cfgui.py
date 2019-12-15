@@ -7,7 +7,8 @@ import cf
 from gui.cfabout import Ui_aboutDialog
 from gui.cfguimain import Ui_MainWindow
 from gui.cfoptions import Ui_OptionsWindow
-
+import qdarkstyle
+import configparser
 
 class cfMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -43,12 +44,13 @@ class AboutGuiControl:
 
 class OptionsGuiControl:
     """Cs-Fetch options window gui contoller class"""
-    def __init__(self, widget, view, configuration_file, session):
+    def __init__(self, widget, view, configuration_file, session, app):
         self._view = view
         self._widget = widget
         self._session = session
         self._configfile = configuration_file
         self._fields = [self._session.field_labels[f] for f in self._session.field_list]
+        self._app = app
         self._load_config()
         self._connect_signals()
 
@@ -69,6 +71,12 @@ class OptionsGuiControl:
         self._view.pwField.setText(self._session.password)  # set password from session
         if self._session.source == 'hamqth':
             self._view.qthButton.setChecked(True)
+        if dark_mode:
+            self._view.darkButton.setChecked(True)
+            self._view.lightButton.setChecked(False)
+        else:
+            self._view.darkButton.setChecked(False)
+            self._view.lightButton.setChecked(True)
 
     def _save_config(self):
         # save options from GUI to cf.conf, hide view and reinitialize
@@ -76,6 +84,13 @@ class OptionsGuiControl:
         source = 'hamqth'
         if self._view.qthButton.isChecked():
             source = 'hamqth'
+        global dark_mode
+        if self._view.darkButton.isChecked():
+            app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+            dark_mode = True
+        else:
+            app.setStyleSheet('')
+            dark_mode = False
         for b in self._view.scrollAreaWidgetContents.children():
             if isinstance(b, QtWidgets.QCheckBox):
                 if b.isChecked():
@@ -172,25 +187,21 @@ class CfGuiControl:
         self._view.statusbar.removeWidget(self._status_widget)
         self._status_widget = QtWidgets.QLabel(f'Session ID: {sessionid}')
         self._view.statusbar.addWidget(self._status_widget)
-        self._view.statusbar.setStyleSheet("background-color: rgb(240, 240, 240);")
 
     def _show_error_status(self, error_text):
         self._view.statusbar.removeWidget(self._status_widget)
         self._status_widget = QtWidgets.QLabel(f'Error: {error_text}')
         self._view.statusbar.addWidget(self._status_widget)
-        self._view.statusbar.setStyleSheet("background-color: rgb(255, 153, 153);")
 
     def _show_timer_status(self, time):
         self._view.statusbar.removeWidget(self._status_widget)
         self._status_widget = QtWidgets.QLabel(f'Retrieved callsign info in {time: .2f} seconds')
         self._view.statusbar.addWidget(self._status_widget)
-        self._view.statusbar.setStyleSheet("background-color: rgb(240, 240, 240);")
 
     def _show_progress_status(self, entered_callsign):
         self._view.statusbar.removeWidget(self._status_widget)
         self._status_widget = QtWidgets.QLabel(f'Retrieving information about {entered_callsign}')
         self._view.statusbar.addWidget(self._status_widget)
-        self._view.statusbar.setStyleSheet("background-color: rgb(240, 240, 240);")
 
 # TODO: copy results to clipboard button
 # TODO: icons for window and task bar
@@ -203,9 +214,15 @@ if __name__ == '__main__':
     app_main = cfMainWindow()
     app_options = cfOptionsWindow()
     app_about = cfAboutWindow()
+    config = configparser.ConfigParser(inline_comment_prefixes='#')
+    config.read(configfile)
+    dark_mode = False
+    if config.get('Theme', 'darkmode') == 'yes':
+        dark_mode = True
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     app_main.show()
     main_controller = CfGuiControl(view=app_main.ui, options_view=app_options, about_view=app_about, configuration_file=configfile, session=active_session)
-    options_controller = OptionsGuiControl(widget=app_options, view=app_options.ui, configuration_file=configfile, session=active_session)
+    options_controller = OptionsGuiControl(widget=app_options, view=app_options.ui, configuration_file=configfile, session=active_session, app=app)
     about_controller = AboutGuiControl(widget=app_about, view=app_about.ui)
     sys.exit(app.exec_())
 

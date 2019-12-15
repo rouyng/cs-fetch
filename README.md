@@ -16,7 +16,8 @@ Features include:
 - User-configurable results
 - API session memory and auto-renewal
 - Basic validation of callsign input
-- Cross-platform with QT-based GUI 
+- Cross-platform with QT-based GUI
+- Optional dark mode 
 
 You can read more about the HamQTH API here: https://www.hamqth.com/developers.php
 <a href="https://www.hamqth.com">
@@ -62,7 +63,6 @@ python cf.py
 - Windows/linux/mac executable packaging
 - Support fetching from FCC and QRZ databases
 - Offline mode, lookup of location based on callsign prefix
-- Dark mode GUI skin!
 
 ## License
 This project is released under the terms of the GNU GPL v3.0. See LICENSE file for details.
