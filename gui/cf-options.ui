@@ -10,8 +10,14 @@
     <x>0</x>
     <y>0</y>
     <width>422</width>
-    <height>303</height>
+    <height>403</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="contextMenuPolicy">
    <enum>Qt::NoContextMenu</enum>
@@ -121,7 +127,7 @@
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>270</y>
+     <y>370</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -134,7 +140,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>270</y>
+     <y>370</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -149,7 +155,7 @@
      <x>230</x>
      <y>20</y>
      <width>181</width>
-     <height>241</height>
+     <height>331</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -594,6 +600,48 @@
    <property name="text">
     <string>Select fields to display</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>270</y>
+     <width>211</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Theme</string>
+   </property>
+   <widget class="QRadioButton" name="lightButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>83</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Light</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="darkButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>83</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Dark</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
