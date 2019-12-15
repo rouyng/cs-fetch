@@ -13,6 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_OptionsWindow(object):
     def setupUi(self, OptionsWindow):
         OptionsWindow.setObjectName("OptionsWindow")
+        OptionsWindow.setWindowModality(QtCore.Qt.ApplicationModal)
         OptionsWindow.resize(422, 303)
         OptionsWindow.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
         self.accountBox = QtWidgets.QGroupBox(OptionsWindow)
@@ -57,6 +58,7 @@ class Ui_OptionsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 160, 1103))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setContentsMargins(3, 3, 0, 0)
