@@ -84,12 +84,13 @@ class OptionsGuiControl:
         source = 'hamqth'
         if self._view.qthButton.isChecked():
             source = 'hamqth'
+        global dark_mode
         if self._view.darkButton.isChecked():
             app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-            global dark_mode
             dark_mode = True
         else:
             app.setStyleSheet('')
+            dark_mode = False
         for b in self._view.scrollAreaWidgetContents.children():
             if isinstance(b, QtWidgets.QCheckBox):
                 if b.isChecked():
