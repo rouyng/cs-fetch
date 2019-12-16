@@ -1,14 +1,15 @@
+import configparser
 import sys
 from timeit import default_timer as timer
 
+import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 import cf
 from gui.cfabout import Ui_aboutDialog
 from gui.cfguimain import Ui_MainWindow
 from gui.cfoptions import Ui_OptionsWindow
-import qdarkstyle
-import configparser
+
 
 class cfMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -195,7 +196,7 @@ class CfGuiControl:
 
     def _show_timer_status(self, time):
         self._view.statusbar.removeWidget(self._status_widget)
-        self._status_widget = QtWidgets.QLabel(f'Retrieved callsign info in {time: .2f} seconds')
+        self._status_widget = QtWidgets.QLabel(f'Retrieved callsign info in {time:.2f} seconds')
         self._view.statusbar.addWidget(self._status_widget)
 
     def _show_progress_status(self, entered_callsign):
