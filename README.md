@@ -1,14 +1,16 @@
-# cs-fetch
+# cs-fetch 0.5.0
 A simple program to lookup amateur radio call sign information via the HamQTH.com API. Includes GUI and 
 interactive command-line interfaces.
 
-By Ross, KJ7GES
-
 ## Overview
 cs-fetch (or callsign-fetch) is intended to be a simple, fast and flexible way to look up information about
-amateur (ham) radio call signs. It is not intended to replace logging programs or web databases, just as an aid to
-radio operation and monitoring. Currently supports fetching information from the HamQTH.com database, with plans to
-allow selectable use of FCC and QRZ.com databases. cs-fetch is written in Python and uses PyQt5 for the GUI interface. 
+amateur (ham) radio call  as an aid to radio operation and monitoring. It is not a full featured logging 
+application.
+ 
+ Currently, cs-fetch supports fetching information from the HamQTH.com database, with plans to
+allow selectable use of FCC and QRZ.com databases. 
+
+cs-fetch is written in Python and uses PyQt5 for the GUI interface. 
 Bug/issue reports and code contributions are welcome.
 
 Features include:
@@ -25,6 +27,20 @@ You can read more about the HamQTH API here: https://www.hamqth.com/developers.p
 </a> 
 
 ## Installation
+
+The simplest way to run cs-fetch is to download one of the executable files pre-built for your operating system. These 
+are packaged as .zip archives in the directory `executables/`. Separate executable files are provided for command line 
+ and GUI versions. Before running, open `cf.conf` in your favorite text editor and add your HamQTH.com username/password
+  to the `[Credentials]` section. Then you can run cs-fetch by executing `cf` (command line version) or `cfgui` 
+  (GUI version).
+ 
+ Currently executables are provided for Windows 10 (may work on earlier Windows versions, but has not been tested). 
+ Ubuntu, Raspbian and Mac packages coming soon.
+
+
+### Running from source
+If you want to download the python source files and run the application that way, follow these instructions.
+
 cs-fetch was written and tested with Python 3.7.0, so you should have this version or a newer installed.
 It may work with earlier versions of Python, but I have not tested this.
 
@@ -33,7 +49,6 @@ command in the installation directory:
 ```
 pip3 install -r requirements.txt
 ```
-
 Before running, add your HamQTH.com credentials to the `[Credentials]` section in `cf.conf`. 
 You can create a HamQTH account here.
 
@@ -60,7 +75,7 @@ python cf.py
 - `requirements.txt`: python requirements file
 
 ## TODO
-- Windows/linux/mac executable packaging
+- Ubuntu/Raspbian/Mac executable packaging
 - Support fetching from FCC and QRZ databases
 - Offline mode, lookup of location based on callsign prefix
 
