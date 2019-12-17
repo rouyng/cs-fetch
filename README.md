@@ -1,4 +1,4 @@
-# cs-fetch 0.5.0
+# cs-fetch
 A simple program to lookup amateur radio call sign information via the HamQTH.com API. Includes GUI and 
 interactive command-line interfaces.
 
