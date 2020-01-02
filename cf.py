@@ -16,6 +16,12 @@ import requests
 
 # BEGIN FetchSession Class
 class FetchSession():
+    """
+    Class for requesting callsign data from the HamQTH API.
+
+    Credentials and fields to return are all taken from the configuration file (cf.conf).
+    Additional functions to support requesting data from FCC ULS and QRZ.com will eventually be added to this class.
+    """
     def __init__(self, configuration_file, data_source='hamqth'):
         self._configfile = configuration_file  # configuration file, should be cf.conf
         self._config = configparser.ConfigParser(inline_comment_prefixes='#')
@@ -77,7 +83,7 @@ class FetchSession():
         self._get_fields_to_print()
 
     def session_initialize(self):
-        # Reads credentials from config file and establishes a new/existing session
+        """Reads credentials from config file and establishes a new/existing session"""
         self.session_error = False
         self.session_id = None
         if self.username == '' or self.password == '':
@@ -106,6 +112,7 @@ class FetchSession():
             self.get_session_hamqth(self.username, self.password)
 
     def get_session_hamqth(self, username, password):
+        """Gets a new session ID from the HamQTH API, with error handling if credentials wrong or connection broken"""
         print(f'Starting new {self.source} session as {self.username}...')
         try:
             session_req = requests.get(f'https://www.hamqth.com/xml.php?u={username}&p={password}')
@@ -127,14 +134,14 @@ class FetchSession():
             self.session_error = se
 
     def _get_fields_to_print(self):
-        # read config
+        """Set self.field_list variable with fields that should be printed from configuration file"""
         self.field_list = []
         for f in self._config.options('Fields to print'):
             if self._config.getboolean('Fields to print', f):
                 self.field_list.append(f)
 
     def write_config(self, new_fields, new_username, new_password, new_source, dark_mode):
-        # write changed configuration to the configfile and re-initialize session
+        """write changed configuration to the configfile and re-initialize session"""
         for f in self._config.options('Fields to print'):
             if f in new_fields:
                 self._config.set('Fields to print', f, 'yes')
@@ -158,17 +165,17 @@ class FetchSession():
         self.session_initialize()
         self._get_fields_to_print()
 
-
-
-
 # END FetchSession Class
 
 # BEGIN STATIC FUNCTION DEFINITIONS
 
 
 def validate_callsign(cs):
-    # This function accepts input of callsign to be looked up and checks it against callsign conventions
-    # returns True if it appears to be valid, otherwise it prints an error message and returns False
+    """
+    This function accepts input of callsign to be looked up and checks it against callsign conventions.
+
+    Returns False if it appears to be valid, otherwise it returns an error message.
+    """
     cs_err = ''  # this string stores any callsign validation error
     valid_chars = string.digits + string.ascii_letters  # callsigns should only contain letters and digits
     while cs_err == '':
@@ -186,9 +193,12 @@ def validate_callsign(cs):
 
 
 def fetch_callsign_data(session_id, callsign):
-    # This function requests information from the HamQTH API given a valid session ID and callsign
-    # If the API returns an error (including if the callsign is not found), this function returns the error message str
-    # If the callsign's info is found on HamQTH, the function returns info in a dict
+    """
+    This function requests information from the HamQTH API given a valid session ID and callsign.
+
+    If the API returns an error (including if the callsign is not found), this function returns the error message str
+    If the callsign's info is found on HamQTH, the function returns info in a dict
+    """
     try:
         callsignreq = requests.get(f'https://www.hamqth.com/xml.php?id={session_id}&callsign={callsign}&prg=cs-fetch')
         callsignreq.raise_for_status()  # check whether HTTP request was successful
@@ -207,7 +217,7 @@ def fetch_callsign_data(session_id, callsign):
 
 
 def print_callsign_info(callsign_dictionary, labels, print_these_fields=('adr_name')):
-    # This function prints selected fields from the dict returned by fetchcallsign(), along with human-friendly labels
+    """This function prints selected fields from the dict returned by fetchcallsign, along with human-friendly labels"""
     for key in print_these_fields:
         if key in labels.keys() & callsign_dictionary.keys():
             print('{}: {}'.format(labels[key], callsign_dictionary[key]))
