@@ -133,7 +133,7 @@ class FetchSession():
             if self._config.getboolean('Fields to print', f):
                 self.field_list.append(f)
 
-    def write_config(self, new_fields, new_username, new_password, new_source):
+    def write_config(self, new_fields, new_username, new_password, new_source, dark_mode):
         # write changed configuration to the configfile and re-initialize session
         for f in self._config.options('Fields to print'):
             if f in new_fields:
@@ -149,6 +149,10 @@ class FetchSession():
             self.source = new_source
             with open('session.json', 'w') as e:  # store session_dict in JSON file
                 json.dump({'SID': None, 'EXP': None}, e)
+        if dark_mode:
+            self._config.set('Theme', 'darkmode', 'yes')
+        else:
+            self._config.set('Theme', 'darkmode', 'no')
         with open(self._configfile, 'w') as file:  # write the configuration file
             self._config.write(file)
         self.session_initialize()
