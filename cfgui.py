@@ -44,11 +44,17 @@ class CfGuiControl:
         self._options_widget = CfOptionsWindow()
         self._options_view = self._options_widget.ui
         self._configfile = configuration_file
+        self._config = configparser.ConfigParser(inline_comment_prefixes='#')
         self._session = cf.FetchSession(self._configfile)
         self._fields = [self._session.field_labels[f] for f in self._session.field_list]
         self._results = {}
         self._label_font = QtGui.QFont()
         self._label_font.setBold(True)
+        self._dark_mode = False
+        self._config.read(self._configfile)
+        if self._config.get('Theme', 'darkmode') == 'yes':
+            self._dark_mode = True
+            app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
         self._csinput = None
         self._status_widget = None
         self._check_session_status()
@@ -164,7 +170,7 @@ class CfGuiControl:
         self._options_view.pwField.setText(self._session.password)  # set password from session
         if self._session.source == 'hamqth':
             self._options_view.qthButton.setChecked(True)
-        if dark_mode:
+        if self._dark_mode:
             self._options_view.darkButton.setChecked(True)
             self._options_view.lightButton.setChecked(False)
         else:
@@ -177,13 +183,12 @@ class CfGuiControl:
         source = 'hamqth'
         if self._options_view.qthButton.isChecked():
             source = 'hamqth'
-        global dark_mode
         if self._options_view.darkButton.isChecked():
             app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-            dark_mode = True
+            self._dark_mode = True
         else:
             app.setStyleSheet('')
-            dark_mode = False
+            self._dark_mode = False
         for b in self._options_view.scrollAreaWidgetContents.children():
             if isinstance(b, QtWidgets.QCheckBox):
                 if b.isChecked():
@@ -193,7 +198,7 @@ class CfGuiControl:
                                    self._options_view.userField.text(),
                                    self._options_view.pwField.text(),
                                    source,
-                                   dark_mode)
+                                   self._dark_mode)
         self._options_widget.close()
         self._load_config()
         self._check_session_status()
@@ -212,14 +217,8 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication([])
     app.setAttribute(QtCore.Qt.AA_DisableWindowContextHelpButton, True)  # remove ? from title bars
     app_main = CfMainWindow()
-    config = configparser.ConfigParser(inline_comment_prefixes='#')
-    config.read(configfile)
-    dark_mode = False
-    if config.get('Theme', 'darkmode') == 'yes':
-        dark_mode = True
-        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-    app_main.show()
     controller = CfGuiControl(main_view=app_main.ui, configuration_file=configfile)
+    app_main.show()
     sys.exit(app.exec_())
 
 
