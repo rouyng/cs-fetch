@@ -133,6 +133,28 @@ class FetchSession():
         except (requests.exceptions.ConnectionError, ConnectionError) as se:
             self.session_error = se
 
+    def get_session_qrz(self, username, password):
+        """Gets a new session ID from the QRZ.com API, with error handling if credentials wrong or connection broken"""
+        print(f'Starting new QRZ session as {username}...')
+        try:
+            session_req = requests.get(
+                f'http://xmldata.qrz.com/xml/current/?username={username};password={password};agent=csf0.6')
+            session_req.raise_for_status()  # check whether HTTP request was successful
+            root = ET.fromstring(session_req.content)  # get XML tree from HTTPS request results
+            session_id = root[0][0].text
+            if session_id == 'Username/password incorrect ':
+                raise ConnectionError("Wrong user name or password! Please enter valid QRZ.com credentials in cf.conf")
+            else:
+                session_dict = {'SID': str(session_id), 'EXP': None, 'SOURCE': 'QRZ'}
+                with open('session.json', 'w') as e:  # store session_dict in JSON file
+                    json.dump(session_dict, e)
+                print(
+                    f'Connected to QRZ.com as {username}\nSession ID: {session_id}')
+            self.session_id = session_id
+        except (requests.exceptions.ConnectionError, ConnectionError) as se:
+            session_error = se
+            print(session_error)
+
     def _get_fields_to_print(self):
         """Set self.field_list variable with fields that should be printed from configuration file"""
         self.field_list = []
