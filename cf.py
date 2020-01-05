@@ -150,7 +150,7 @@ class FetchSession():
                     json.dump(session_dict, e)
                 print(
                     f'Connected to QRZ.com as {username}\nSession ID: {session_id}')
-            self.session_id = session_id
+                self.session_id = session_id  # if no error occurs, set class scope session_id
         except (requests.exceptions.ConnectionError, ConnectionError) as se:
             session_error = se
             print(session_error)
@@ -214,20 +214,24 @@ def validate_callsign(cs):
     return cs_err
 
 
-def fetch_callsign_data(session_id, callsign):
+def fetch_callsign_data(session_id, callsign, source):
     """
     This function requests information from the HamQTH API given a valid session ID and callsign.
 
     If the API returns an error (including if the callsign is not found), this function returns the error message str
     If the callsign's info is found on HamQTH, the function returns info in a dict
     """
+    if source == 'hamqth':
+        request_url = f'https://www.hamqth.com/xml.php?id={session_id}&callsign={callsign}&prg=csf0.6'
+    elif source == 'qrz':
+        request_url = f'http://xmldata.qrz.com/xml/current/?s={session_id};callsign={callsign}'
     try:
-        callsignreq = requests.get(f'https://www.hamqth.com/xml.php?id={session_id}&callsign={callsign}&prg=cs-fetch')
+        callsignreq = requests.get(request_url)
         callsignreq.raise_for_status()  # check whether HTTP request was successful
         csroot = ET.fromstring(callsignreq.content)
-        if 'error' in csroot[0][0].tag:
-            qtherror = csroot[0][0].text
-            return qtherror
+        if 'error' in csroot[0][0].tag.lower():
+            api_error = csroot[0][0].text
+            return api_error
         else:
             csdict = {}
             for child in csroot[0]:
@@ -238,7 +242,7 @@ def fetch_callsign_data(session_id, callsign):
         return 'Connection error, please check your internet connection'
 
 
-def print_callsign_info(callsign_dictionary, labels, print_these_fields=('adr_name')):
+def print_callsign_info(callsign_dictionary, labels, print_these_fields='adr_name'):
     """This function prints selected fields from the dict returned by fetchcallsign, along with human-friendly labels"""
     for key in print_these_fields:
         if key in labels.keys() & callsign_dictionary.keys():
@@ -267,7 +271,7 @@ if __name__ == "__main__":
             else:
                 print(validate_callsign(user_input))
                 continue
-        callsign_result = fetch_callsign_data(session.session_id, callsign)  # request info from API and return as dict
+        callsign_result = fetch_callsign_data(session.session_id, callsign, session.source)  # request info from API and return as dict
         if callsign_result.__class__ != dict:
             print(f'Error: {callsign_result}')  # Errors returned by API should be a string, real results are a dict
             if 'Session does not exist or expired' in callsign_result:

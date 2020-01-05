@@ -99,7 +99,7 @@ class CfGuiControl:
             # if user's input passes validation, cf.validate_callsign returns False, and we can query the API
             start = timer()  # start timing api fetch
             self._show_progress_status(self._csinput)
-            self._results = cf.fetch_callsign_data(self._session.session_id, self._csinput)
+            self._results = cf.fetch_callsign_data(self._session.session_id, self._csinput, self._session.source)
             end = timer()  # end timing api fetch
             if self._results.__class__ == str:
                 # if the results of cf.fetch_callsign_data() are not a dictionary, the API has produced an error
