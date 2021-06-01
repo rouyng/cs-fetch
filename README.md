@@ -2,6 +2,8 @@
 A simple program to lookup amateur radio call sign information via the HamQTH.com API. Includes GUI and 
 interactive command-line interfaces.
 
+**This repository is no longer actively maintained. Feel free to use and fork it, but I cannot provide support or honor feature requests**
+
 ## Overview
 cs-fetch (or callsign-fetch) is intended to be a simple, fast and flexible way to look up information about
 amateur (ham) radio call  as an aid to radio operation and monitoring. It is not a full featured logging 
